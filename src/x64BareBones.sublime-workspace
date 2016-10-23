@@ -1,0 +1,590 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"OBJECTS",
+				"OBJECTS_LIBC"
+			],
+			[
+				"So",
+				"SOURCES_LIBC"
+			],
+			[
+				"c",
+				"current_video"
+			],
+			[
+				"IS",
+				"IS_MULTIPLE_RETURN	label"
+			],
+			[
+				"prog",
+				"program_path"
+			],
+			[
+				"pr",
+				"prmpt"
+			],
+			[
+				"msg",
+				"msg_len	equ	$	label"
+			],
+			[
+				"ms",
+				"msg_len	equ	$	label"
+			],
+			[
+				"str",
+				"string_len	equ	$	label"
+			],
+			[
+				"b",
+				"begin	begin … rescue … end"
+			],
+			[
+				"lie",
+				"line_number"
+			],
+			[
+				"label",
+				"label_2"
+			],
+			[
+				"line",
+				"line_number"
+			],
+			[
+				"req",
+				"require_relative"
+			],
+			[
+				"Var",
+				"VARIABLE_LETTERS"
+			],
+			[
+				"L",
+				"LABEL_LETTERS"
+			],
+			[
+				"la",
+				"label"
+			],
+			[
+				"to",
+				"to_s"
+			],
+			[
+				"vol",
+				"volando"
+			],
+			[
+				"avion",
+				"avion_vuela"
+			],
+			[
+				"p",
+				"p_type"
+			],
+			[
+				"P",
+				"PibeTrolo"
+			],
+			[
+				"IW",
+				"IWRAPPER"
+			],
+			[
+				"i",
+				"iWrapper"
+			],
+			[
+				"put",
+				"put_wall_post"
+			],
+			[
+				"fb_",
+				"fb_secret_key"
+			],
+			[
+				"fb",
+				"fb_app_id"
+			],
+			[
+				"page",
+				"page_graph"
+			],
+			[
+				"get_",
+				"get_connections"
+			],
+			[
+				"art",
+				"article"
+			],
+			[
+				"arti",
+				"articles_path"
+			],
+			[
+				"artic",
+				"article_path"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"ssc",
+				"Set Syntax: C"
+			],
+			[
+				"ssnasm",
+				"Set Syntax: Assembly x86 (NASM)"
+			],
+			[
+				"nasm",
+				"Set Syntax: Assembly x86 (NASM)"
+			],
+			[
+				"ruby",
+				"Set Syntax: Ruby"
+			],
+			[
+				"conn",
+				"Remote: Connect to Session"
+			],
+			[
+				"host",
+				"Remote: Host Session"
+			],
+			[
+				"connec",
+				"Remote: Connect to Session"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"make",
+				"Build With: Make"
+			],
+			[
+				"makef",
+				"Set Syntax: Makefile"
+			],
+			[
+				"ssasm",
+				"Set Syntax: Assembly x86 (NASM)"
+			],
+			[
+				"pack ins",
+				"Package Control: Install Package"
+			],
+			[
+				"ssrb",
+				"Set Syntax: Ruby"
+			],
+			[
+				"ssja",
+				"Set Syntax: Java"
+			],
+			[
+				"ss rb",
+				"Set Syntax: Ruby"
+			],
+			[
+				"ssrail",
+				"Set Syntax: Ruby on Rails"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 58.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/ArkanRow/Projects/C-C++/x64BareBones"
+	],
+	"file_history":
+	[
+		"/home/jant/TP_Arqui/.git/config",
+		"/home/jant/TP_Arqui/src/Kernel/libc/Makefile",
+		"/home/jant/TP_Arqui/src/Kernel/libc/Makefile.inc",
+		"/home/jant/TP_Arqui/src/Kernel/libc/video.c",
+		"/home/jant/TP_Arqui/src/Kernel/include/lib.h",
+		"/home/jant/Downloads/0001-Example-with-Interruptions.patch",
+		"/home/jant/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/jant/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
+		"/home/jant/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
+		"/home/jant/TP_Arqui/src/Makefile",
+		"/home/jant/TP_Arqui/src/Kernel/include/video.h",
+		"/home/jant/TP_Arqui/src/Kernel/naiveConsole.c",
+		"/home/jant/TP_Arqui/src/Kernel/kernel.c",
+		"/home/jant/TP_Arqui/lib/video.c",
+		"/home/jant/TP_Arqui/src/Kernel/lib.c",
+		"/home/jant/TP_Arqui/src/Kernel/asm/macros.m",
+		"/home/jant/TP_Arqui/src/Kernel/video.c",
+		"/home/jant/TP_Arqui/lib/video.h",
+		"/home/jant/TP_Arqui/src/Bootloader/Pure64/Pure64 Manual.md",
+		"/home/jant/TP_Arqui/Kernel/kernel.c",
+		"/home/jant/TP_Arqui/video.c",
+		"/home/jant/workspace/arqui/Tp2/ex5/main.asm",
+		"/home/jant/workspace/arqui/Tp2/ex3/main.asm",
+		"/home/jant/workspace/arqui/Tp2/ex5/makefile",
+		"/home/jant/workspace/arqui/Tp2/ex3/main.s",
+		"/home/jant/workspace/arqui/Tp2/ex1/ex1.asm",
+		"/home/jant/workspace/arqui/Tp2/ex5/main.s",
+		"/home/jant/workspace/tuempleoya/public/robots.txt",
+		"/home/jant/workspace/arqui/tp3/ex8/makefile",
+		"/home/jant/workspace/arqui/tp3/ex8/loader.asm",
+		"/home/jant/workspace/arqui/tp3/ex8/main.c",
+		"/home/jant/.ssh/id_rsa.pub",
+		"/home/jant/workspace/rb/L_Language/main.rb",
+		"/home/jant/workspace/rb/L_Language/core/Shell.rb",
+		"/home/jant/workspace/rb/L_Language/core/Instruction.rb",
+		"/home/jant/workspace/rb/L_Language/core/Program.rb",
+		"/home/jant/workspace/rb/L_Language/core/utils.rb",
+		"/home/jant/workspace/arqui/tp3/ex7/main.c",
+		"/home/jant/workspace/arqui/tp3/ex7/main.s",
+		"/home/jant/workspace/arqui/tp3/ex7/global_unint_array.asm",
+		"/home/jant/workspace/arqui/tp3/ex7/global_uninit_array.c",
+		"/home/jant/workspace/arqui/tp3/ex4/make",
+		"/home/jant/workspace/arqui/tp3/ex4/factorial.c",
+		"/home/jant/workspace/arqui/tp3/ex1/main.asm",
+		"/home/jant/workspace/arqui/tp3/ex1/makefile",
+		"/home/jant/workspace/arqui/tp3/ex1/make",
+		"/home/jant/workspace/arqui/tp3/ex2/main.s",
+		"/home/jant/Desktop/SD_proba.rb",
+		"/home/jant/workspace/arqui/tp3/ex1/main3.asm",
+		"/home/jant/workspace/arqui/tp3/ex1/main2.asm",
+		"/home/jant/workspace/c/AST/main.c",
+		"/home/jant/workspace/Arqui/tp3/ex1/main.asm",
+		"/home/jant/workspace/Arqui/tp3/ex1/hello.c",
+		"/home/jant/workspace/Arqui/Tp2/ex2/commands.txt",
+		"/home/jant/workspace/Arqui/Tp2/ex2/upcase.c",
+		"/home/jant/workspace/Arqui/Tp2/ex2/ex2.asm",
+		"/home/jant/workspace/Arqui/Tp2/ex2/makefile",
+		"/home/jant/workspace/Arqui/Tp2/ex2/make",
+		"/home/jant/workspace/Arqui/Tp2/ex2/ex2.o",
+		"/home/jant/workspace/Arqui/Tp2/ex2/hola",
+		"/home/jant/Desktop/lang_L/Instruction.rb",
+		"/home/jant/workspace/Arqui/Tp2/ex2.asm",
+		"/home/jant/.ssh/id_rsa",
+		"/home/jant/workspace/Arqui/.git/HEAD",
+		"/home/jant/workspace/Arqui/Tp2/ex1.asm",
+		"/home/jant/workspace/toy_app/test/fixtures/users.yml",
+		"/home/jant/Desktop/quine.rb",
+		"/home/jant/Desktop/lang_L/Variable.rb",
+		"/home/jant/Desktop/lang_L/utils.rb",
+		"/home/jant/Desktop/lang_L/main.rb",
+		"/home/jant/Desktop/lang_L/exceptions.rb",
+		"/home/jant/Desktop/lang_L/Label.rb",
+		"/home/jant/Desktop/lang_L/jose",
+		"/home/jant/Desktop/lang L inst",
+		"/home/jant/Desktop/XQUERY",
+		"/home/jant/Desktop/xpath_problemas.txt",
+		"/home/jant/Desktop/xpath_problemas",
+		"/home/jant/Desktop/hola.rb",
+		"/home/jant/xpath",
+		"/home/jant/Desktop/weird.rb",
+		"/home/jant/workspace/QuilmesWeb/README.md",
+		"/home/jant/q.rb",
+		"/home/jant/Desktop/TestingC/ruby/ext/Setup",
+		"/home/jant/Desktop/TestingC/ruby/ruby",
+		"/home/jant/Desktop/TestingC/ruby/defines.h",
+		"/home/jant/Desktop/TestingC/ruby/README.md",
+		"/home/jant/Desktop/TestingC/volando.c",
+		"/home/jant/Desktop/TestingC/probando.c",
+		"/home/jant/Desktop/TestingC/test.c",
+		"/home/jant/workspace/toy_app/config/routes.rb",
+		"/home/jant/workspace/QuilmesWeb/app/views/comments/new.html.erb",
+		"/home/jant/workspace/QuilmesWeb/app/controllers/comments_controller.rb",
+		"/home/jant/workspace/QuilmesWeb/app/views/welcome/index.html.erb",
+		"/home/jant/workspace/QuilmesWeb/config/routes.rb",
+		"/home/jant/workspace/QuilmesWeb/app/views/comments/index.html.erb",
+		"/home/jant/workspace/Comments/config/routes.rb",
+		"/home/jant/workspace/QuilmesWeb/Gemfile",
+		"/home/jant/workspace/Comments/app/models/comment.rb",
+		"/home/jant/workspace/Comments/app/views/comments/csv.html.erb",
+		"/home/jant/workspace/Comments/app/views/comments/index.html.erb",
+		"/home/jant/Downloads/Comentarios Quilmes - Hoja 1.csv",
+		"/home/jant/workspace/Comments/app/controllers/comments_controller.rb",
+		"/home/jant/Downloads/weather_data_train (1).csv",
+		"/home/jant/Downloads/weather_data_train.csv",
+		"/home/jant/workspace/toy_app/app/controllers/application_controller.rb",
+		"/home/jant/workspace/toy_app/Gemfile",
+		"/home/jant/workspace/hello_app/Gemfile.lock",
+		"/home/jant/workspace/hello_app/Gemfile",
+		"/home/jant/bash.rc",
+		"/home/jant/Desktop/fb/fbApiTest.rb",
+		"/home/jant/Desktop/fb/fbPost.rb",
+		"/home/jant/Desktop/D2Q/app/views/comments/_form.html.erb",
+		"/home/jant/Desktop/D2Q/app/views/comments/_comment.html.erb",
+		"/home/jant/Desktop/D2Q/app/controllers/comments_controller.rb",
+		"/home/jant/Desktop/D2Q/app/models/article.rb",
+		"/home/jant/Desktop/D2Q/db/migrate/20160705015510_create_comments.rb",
+		"/home/jant/Desktop/D2Q/db/schema.rb",
+		"/home/jant/Desktop/D2Q/app/models/comment.rb",
+		"/home/jant/Desktop/D2Q/app/controllers/articles_controller.rb",
+		"/home/jant/Desktop/D2Q/app/views/articles/index.html.erb",
+		"/home/jant/Desktop/D2Q/app/views/articles/new.html.erb",
+		"/home/jant/Desktop/D2Q/app/views/articles/edit.html.erb",
+		"/home/jant/Desktop/D2Q/app/views/articles/show.html.erb",
+		"/home/jant/Desktop/D2Q/app/views/articles/_form.html.erb",
+		"/home/jant/Desktop/D2Q/app/controllers/ar",
+		"/home/jant/Desktop/D2Q/config/routes.rb",
+		"/home/jant/Desktop/D2Q/app/views/welcome/index.html.erb",
+		"/home/jant/Desktop/D2Q/db/migrate/20160704200638_create_articles.rb"
+	],
+	"find":
+	{
+		"height": 23.0
+	},
+	"find_in_files":
+	{
+		"height": 90.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"file_ex",
+			"sources",
+			";\n",
+			"hola",
+			"puts",
+			"lib",
+			"clear",
+			"videa",
+			"width",
+			"*)",
+			"ncprint",
+			"i",
+			"#",
+			"sampleCode",
+			"x64",
+			"void ncprint(",
+			"int ncprint(",
+			"ncprint(",
+			"ncprint",
+			"uint",
+			"limit",
+			"get_",
+			"edx",
+			"ecx",
+			"n",
+			"edx",
+			"ebp",
+			"ret",
+			"main",
+			"4",
+			"eax",
+			" ",
+			"variable",
+			"label",
+			"label_",
+			"Label_l",
+			"LABEL",
+			"v",
+			"to_",
+			"puts",
+			"print",
+			"put",
+			"puts",
+			"modul",
+			"opt",
+			"mod",
+			"VALUE",
+			"end",
+			"details",
+			"sql",
+			"path",
+			"#@",
+			"1",
+			"articl",
+			"edit"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"PAJARO"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "x64BareBones.sublime-project",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"kernel/",
+				"src/Kernel/Makefile"
+			],
+			[
+				"naiv",
+				"src/Kernel/naiveConsole.c"
+			],
+			[
+				"lib.c",
+				"src/Kernel/lib.c"
+			],
+			[
+				"vide",
+				"src/Kernel/video.c"
+			],
+			[
+				"kern",
+				"src/Kernel/kernel.c"
+			],
+			[
+				"video",
+				"src/Kernel/video.c"
+			],
+			[
+				"manua",
+				"src/Bootloader/Pure64/Pure64 Manual.md"
+			],
+			[
+				"naive",
+				"src/Kernel/naiveConsole.c"
+			],
+			[
+				"video.c",
+				"lib/video.c"
+			],
+			[
+				"kernel.c",
+				"src/Kernel/kernel.c"
+			],
+			[
+				"post",
+				"public/robots.txt"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 360.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 384.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 319.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
