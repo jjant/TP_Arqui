@@ -29,3 +29,9 @@ void __putc(char c) {
 	*current_video = c;
 	current_video += 2;
 }
+
+void __new_line() {
+	do {
+		__putc(' ');
+	} while((uint64_t)(current_video - video) % (width * 2) != 0);
+}

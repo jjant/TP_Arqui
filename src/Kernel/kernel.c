@@ -101,31 +101,18 @@ void irqDispatcher(int irq) {
 
 int main()
 {	
+	char time[10];
+
 	iSetHandler(0x20, (uint64_t) irq0Handler);
 	
 	setPicMaster(0xFE);
 	
 	sti();
 
-	ncPrint("[Kernel Main]");
-	ncNewline();
-	ncPrint("  Sample code module at 0x");
-	ncPrintHex((uint64_t)sampleCodeModuleAddress);
-	ncNewline();
-	ncPrint("  Calling the sample code module returned: ");
-	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
-	ncNewline();
-	ncNewline();
-
-	ncPrint("  Sample data module at 0x");
-	ncPrintHex((uint64_t)sampleDataModuleAddress);
-	ncNewline();
-	ncPrint("  Sample data module contents: ");
-	ncPrint((char*)sampleDataModuleAddress);
-	ncNewline();
-
-	__clear_line(0);
-	__puts("Borre esta linea y luego imprimi este texto!!");
+	__clear_screen();
+	
+	__puts("Time: ");
+	__puts(__system_time(time));
 
 	return 0;
 
