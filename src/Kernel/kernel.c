@@ -108,12 +108,16 @@ int main()
 	setPicMaster(0xFE);
 	
 	sti();
-
+/*
 	__clear_screen();
 	
 	__puts("Time: ");
 	__puts(__system_time(time));
+*/
 
+	while(1)
+		__putc(__key_pressed());
+	
 	return 0;
 
 }

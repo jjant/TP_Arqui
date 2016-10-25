@@ -36,16 +36,16 @@ int strlen(const char * str) {
 **	Returns dest.
 */
 char * str_reverse(char * dest, const char * src) {
-	char * ret = reverse;
-	int len = strlen(str);
+	char * ret = dest;
+	int len = strlen(src);
 	
 	while(len != 0) {
-		*reverse = str[len--];
+		*dest = src[len--];
 	}
 
-	for(; len != 0; len--, reverse++)
-		*reverse = str[len];
-	*reverse = '\0';
+	for(; len != 0; len--, dest++)
+		*dest = src[len];
+	*dest = '\0';
 
 	return ret;
 }
@@ -55,7 +55,7 @@ char * str_reverse(char * dest, const char * src) {
 ** Buffer must have enough space to accomodate value.
 */
 
-char * int_to_str(char * buffer, int value) {
+char * int_to_str(int value, char * buffer) {
 	char * p = buffer;
 	int power = 0;
 	int shifter = value;

@@ -26,6 +26,9 @@ void __puts(const char * str) {
 }
 
 void __putc(char c) {
+	if(!c)
+		return;
+	
 	*current_video = c;
 	current_video += 2;
 }
