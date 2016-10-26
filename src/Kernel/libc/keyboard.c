@@ -23,6 +23,7 @@ static char code_to_char(int keycode) {
 	char L_code = 0x26;
 	char Z_code = 0x2C;
 	char M_code = 0x32;
+	char SPACE_code = 0x39;
 
 	if(keycode >= Q_code && keycode <= P_code)
 		return keycode_to_char[keycode - Q_code];
@@ -30,9 +31,8 @@ static char code_to_char(int keycode) {
 		return keycode_to_char[keycode - 0x14];
 	else if (keycode >= Z_code && keycode <= M_code)
 		return keycode_to_char[keycode - 0x19];
-	else if (keycode == 0x39)
+	else if (keycode == SPACE_code)
 		return keycode_to_char[KEYCODE_LEN - 1];
 	else
 		return 0;
-
 }
