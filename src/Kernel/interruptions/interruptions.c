@@ -1,4 +1,3 @@
-//interruptions.c
 #include <interruptions.h>
 
 #pragma pack(push)
@@ -18,8 +17,7 @@ typedef struct {
 
 static IDTEntry_t* IDT = (IDTEntry_t*) 0x0;
 
-
-void iSetHandler(int index, uint64_t handler) {
+void __IDT_add_handler(int index, uint64_t handler) {
 	IDT[index].offset_l = (uint16_t) handler & 0xFFFF;
 	IDT[index].offset_m = (uint16_t) (handler >> 16) & 0xFFFF;
 	IDT[index].offset_h = (uint32_t) (handler >> 32) & 0xFFFFFFFF;
@@ -29,6 +27,5 @@ void iSetHandler(int index, uint64_t handler) {
 	
 	IDT[index].attrs = 0x8E;
 	IDT[index].zero_h = 0;	
-	
 }
 

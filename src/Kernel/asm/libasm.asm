@@ -4,7 +4,7 @@ GLOBAL setPicMaster
 GLOBAL irq0Handler
 GLOBAL irq1Handler
 
-EXTERN irqDispatcher
+EXTERN __irq_dispatcher
 
 %include "./asm/macros.m"
 
@@ -13,7 +13,6 @@ section .text
 irq0Handler:
 	irqHandler 0
 	
-
 sti:
 	sti
 	ret
