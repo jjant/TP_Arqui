@@ -39,7 +39,7 @@
 	pushaq
 
 	mov rdi, %1
-	call irqDispatcher
+	call __irq_dispatcher
 	
 	mov al, 20h ; EOI
 	out 20h, al

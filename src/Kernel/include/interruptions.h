@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-void iSetHandler(int index, uint64_t handler);
-
+void __IDT_add_handler(int index, uint64_t handler);
 
 #endif
