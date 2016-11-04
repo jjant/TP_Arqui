@@ -15,7 +15,16 @@ typedef void (*__write_t)(char *, size_t);
 static syscall_t syscall[2];
 
 void __initialize_syscall_vector() {
+	// DEBUG
+	__puts("before added syscall handler to idt");
+	__new_line();
+	//
 	__IDT_add_handler(0x80, (uint64_t)__syscall_handler);
+	// DEBUG
+	__puts("added syscall handler to idt");
+	__new_line();
+	//
+
 	__setup_syscalls();
 }
 

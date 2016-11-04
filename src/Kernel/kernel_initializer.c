@@ -38,11 +38,12 @@ void * getStackBase()
 
 void * __initialize_kernel_binary()
 {
+/*
 	char buffer[10];
 
 	ncPrint("[x64BareBones]");
 	ncNewline();
-
+	
 	ncPrint("CPU Vendor:");
 	ncPrint(cpuVendor(buffer));
 	ncNewline();
@@ -80,5 +81,6 @@ void * __initialize_kernel_binary()
 	ncPrint("[Done]");
 	ncNewline();
 	ncNewline();
+	*/
 	return getStackBase();
 }
