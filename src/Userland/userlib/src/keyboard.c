@@ -1,3 +1,4 @@
+////////// REMOVE
 #include <keyboard.h>
 
 static char keycode_to_char[] = {

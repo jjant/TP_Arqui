@@ -25,10 +25,13 @@ void __puts(const char * str) {
 	for(i = 0; str[i] != '\0'; __putc(str[i++]));
 }
 
-void __putc(char c) {
+void __putc(int c) {
 	if(!c)
 		return;
 	
+	if(c == '\n')
+		return __new_line();
+
 	*current_video = c;
 	current_video += 2;
 }
