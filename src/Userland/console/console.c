@@ -8,8 +8,9 @@
 #define QUIT_PID 					0
 #define INVALID_INPUT_PID 1
 #define HELP_PID					2
+#define ECHO_PID					3
 
-#define SHELL_QUIT -1
+#define SHELL_QUIT 1
 #define SHELL_OK	0
 
 static void initialize_program_vector();
@@ -41,7 +42,9 @@ void console_loop() {
 		}
 
 		pid = parse_input(buffer, current_index);
+
 		execute_program(pid);
+
 		clean_buffer(buffer, current_index);
 		current_index = 0;
 	}
@@ -51,14 +54,19 @@ static void initialize_program_vector() {
 	programs[QUIT_PID] = shell_quit;
 	programs[INVALID_INPUT_PID] = shell_invalid_input;
 	programs[HELP_PID] = shell_help;
+	programs[ECHO_PID] = shell_echo;
 }
 
 uint16_t parse_input(char * kb_buffer, uint16_t size) {
+	uint16_t pid = INVALID_INPUT_PID;
 	if(strcmp(kb_buffer, "HELP") == 0)
-		return HELP_PID;
+		pid = HELP_PID;
+	if(strcmp(kb_buffer, "ECHO") == 0)
+		pid = ECHO_PID;
 	if(strcmp(kb_buffer, "QUIT") == 0)
-		return QUIT_PID;
-	return INVALID_INPUT_PID;
+		pid = QUIT_PID;
+
+	return pid;
 }
 
 uint16_t execute_program(uint16_t pid) {
@@ -83,6 +91,11 @@ uint16_t shell_quit() {
 
 uint16_t shell_help() {
 	puts("Este es el program help.");
+	return SHELL_OK;
+}
+
+uint16_t shell_echo() {
+	puts("Este es el programa echo.");
 	return SHELL_OK;
 }
 
