@@ -3,6 +3,6 @@
 
 void putc(int);
 void puts(char *);
-int strcmp(char *, char *);
+int strcmp(const char *, const char *);
 
 #endif

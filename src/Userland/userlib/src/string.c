@@ -12,7 +12,7 @@ void puts(char * str) {
 }
 
 //returns 0 if both strings are equal, 1 if not (need to implement check for str1<str2 and >).
-int strcmp(char * str1, char * str2) {
+int strcmp(const char * str1, const char * str2) {
 	while(*str1 && *str2) {
 		if(*str1 != *str2){
 			return 1;

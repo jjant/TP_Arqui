@@ -5,22 +5,18 @@
 #define BUFFER_SIZE 128
 #define PROGRAM_COUNT 3
 
-#define QUIT_PID 					0
-#define INVALID_INPUT_PID 1
-#define HELP_PID					2
-#define ECHO_PID					3
+#define MAX_ARG_LEN 50
+#define SHELL_QUIT 	1
+#define SHELL_OK		0
 
-#define SHELL_QUIT 1
-#define SHELL_OK	0
-
-static void initialize_program_vector();
-
-typedef uint16_t (* shell_program)();
-
-static shell_program programs[PROGRAM_COUNT];
+static struct program_s	programs[] = {
+	{"QUIT", shell_quit},
+	{"HELP", shell_help},
+	{"ECHO", shell_echo},
+	{NULL, shell_invalid_input}	// invalid input program determines the end of the programs array.
+};
 
 int main() {
-	initialize_program_vector();
 	console_loop();
 
 	return 0;
@@ -32,69 +28,153 @@ void console_loop() {
 	uint16_t current_index = 0;
 
 	while(1) {
-		uint16_t pid;
-		
+		char args[MAX_ARG_LEN][MAX_ARGS]; //maybe use dynamic memory for this later.
+
 		puts("$ > ");
 		
 		while((c = __key_pressed()) != '\n'){
 			if(c != 0)
 				putc(buffer[current_index++] = c);
 		}
+		buffer[current_index] = '\0';
 
-		pid = parse_input(buffer, current_index);
+		parse_input(buffer, args);
 
-		execute_program(pid);
 
+		puts("PASE EL PARSE\n");
+		puts("ARG[0]=");
+		puts(args[0]);
+		putc('\n');
+
+		execute_program(programs, args);	// args[0] is the name of the program to run.
+
+		puts("Pase execute\n");
 		clean_buffer(buffer, current_index);
 		current_index = 0;
 	}
 }
 
-static void initialize_program_vector() {
-	programs[QUIT_PID] = shell_quit;
-	programs[INVALID_INPUT_PID] = shell_invalid_input;
-	programs[HELP_PID] = shell_help;
-	programs[ECHO_PID] = shell_echo;
-}
+char ** parse_input(char * kb_buffer, char args[][MAX_ARGS]) {
+/*
+	int i, j, k;
+	for(i = 0, j = 0, k = 0; i <= size; i++) {
+		if(i == size) {
+			args[k]
+		}
+		if(kb_buffer[i] == ' ') {
+			args[k][j] = '\0';
+			k++;
+			j = 0;
+		}
+		else {
+			args[k][j++] = kb_buffer[i];
+		}
+	}
+*/
 
-uint16_t parse_input(char * kb_buffer, uint16_t size) {
-	uint16_t pid = INVALID_INPUT_PID;
-	if(strcmp(kb_buffer, "HELP") == 0)
-		pid = HELP_PID;
-	if(strcmp(kb_buffer, "ECHO") == 0)
-		pid = ECHO_PID;
-	if(strcmp(kb_buffer, "QUIT") == 0)
-		pid = QUIT_PID;
+/*
+	int k;
+	int iteration_complete = 0;
+	for(k = 0; *kb_buffer && !iteration_complete; k++) {
+		char * name = args[k];
+		int name_found = 0;
+		int i;
 
-	return pid;
-}
+		for(i = 0; kb_buffer[i] && !name_found; i++) {
+			if(kb_buffer[i] == ' ')
+				name_found = 1;
+			else
+				name[i] = kb_buffer[i];
+		}
+		//CON el buffer con "hola", aca sale con i en 4.
+		//Con el buffer en  
+		puts("\nAca i es: ");
+		putc(i + '0');
+		putc("\n");
+		name[i] = '\0';
 
-uint16_t execute_program(uint16_t pid) {
-	uint16_t ret_value;
-	
+		if(kb_buffer[i] != '\0')
+			kb_buffer += i;
+		else
+			iteration_complete = 1;
+	}
+*/
+
+	int k = 0;
+	char * current = args[0];
 	putc('\n');
-	ret_value = programs[pid]();
-	putc('\n');
+	puts("buffer: ");
+	puts(kb_buffer);
 
-	return ret_value;
+	while(*kb_buffer) {
+		if(*kb_buffer != ' ') {
+			*current = *kb_buffer;
+			current++;
+		}
+		else {
+			*current = '\0';
+			k++;
+			current = args[k];
+		}
+
+		kb_buffer++;
+	}
+	if(current != NULL)
+		*current = '\0';
+
+
+	////DEBUG
+	putc('\n');
+	puts("args[0]: ");
+	puts(args[0]);
+	putc('\n');
+	puts("arg[1]: ");
+	puts(args[1]);
+	putc('\n');
+	puts("arg[2]: ");
+	puts(args[2]);
+	putc('\n');
+	////
+	return args;
 }
 
-uint16_t shell_invalid_input() {
+uint16_t execute_program(struct program_s * programs, char args[][MAX_ARGS]) {
+	int i = 0;
+	struct program_s current = programs[i];
+	uint16_t ret_val;
+
+	putc('\n');
+  while(current.name) {
+  	if(strcmp(current.name, args[0]) == 0) {
+  		ret_val = current.fnc(args);
+  		goto clean_up;
+  	}
+  	else {
+  		current = programs[++i];
+  	}
+	}
+	ret_val = current.fnc(args);
+
+	clean_up:	putc('\n');
+	return ret_val;
+}
+
+uint16_t shell_invalid_input(const char ** args) {
 	puts("Invalid input detected.");
 	return SHELL_OK;
 }
 
-uint16_t shell_quit() {
+uint16_t shell_quit(const char ** args) {
 	puts("Quitting shell.");
 	return SHELL_QUIT;
 }
 
-uint16_t shell_help() {
+uint16_t shell_help(const char ** args) {
 	puts("Este es el program help.");
 	return SHELL_OK;
 }
 
-uint16_t shell_echo() {
+uint16_t shell_echo(const char ** args) {
 	puts("Este es el programa echo.");
 	return SHELL_OK;
 }
