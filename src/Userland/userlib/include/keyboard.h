@@ -1,11 +1,9 @@
-#ifndef __KEYBOARD_H
-#define __KEYBOARD_H
+#ifndef KEYBOARD_H
+#define KEYBOARD_H
 
 #include <string.h>
 
-int __key_pressed_asm();
-void __print_key_pressed();
-char __key_pressed();
-static char code_to_char(int);
+char getchar_asm();
+char getchar();
 
 #endif

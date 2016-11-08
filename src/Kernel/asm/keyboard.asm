@@ -1,4 +1,5 @@
 GLOBAL __key_pressed_asm
+GLOBAL __getchar
 
 __key_pressed_asm:
 	push	rbp
@@ -10,6 +11,16 @@ __key_pressed_asm:
 	jnz		key_not_ready
 	xor		rax, rax	; key is ready to be read, clear rax.
 	in		al, 60h
+	leave
+	ret
+
+__getchar:
+	push 	rbp
+	mov 	rbp, rsp
+
+	xor		rax, rax	; key is ready to be read, clear rax.
+	in		al, 60h
+	
 	leave
 	ret
 

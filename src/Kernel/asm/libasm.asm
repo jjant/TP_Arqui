@@ -10,6 +10,9 @@ EXTERN __irq_dispatcher
 
 section .text
 
+irq1Handler:
+	irqHandler 1
+
 irq0Handler:
 	irqHandler 0
 	

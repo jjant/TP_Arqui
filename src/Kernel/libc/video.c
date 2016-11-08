@@ -1,5 +1,7 @@
 #include <video.h>
 
+#define BACKSPACE 0x0E
+
 static uint8_t * const video = (uint8_t *) 0xB8000;
 static uint8_t * current_video = (uint8_t *) 0xB8000;
 static const int width = 80;
@@ -26,8 +28,13 @@ void __puts(const char * str) {
 }
 
 void __putc(int c) {
-	if(!c)
+	if(!c) return;
+
+	if (c == BACKSPACE) {
+		current_video -= 2;
+		*(current_video) = ' ';
 		return;
+	}
 	
 	if(c == '\n')
 		return __new_line();
