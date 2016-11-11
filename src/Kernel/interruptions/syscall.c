@@ -5,9 +5,11 @@
 
 #define INTERRUPT_VECTOR	0x80
 #define SYSCALL_SIZE 256
+
 #define SYSCALL_WRITE 4
 #define SYSCALL_READ  3
-#define SYSCALL_CLEAN_SCREEN 	2
+#define SYSCALL_CLEAN_SCREEN  2
+#define SYSCALL_SET_COLOR  1
 
 static void __setup_syscalls();
 
@@ -24,7 +26,8 @@ void __initialize_syscall_vector() {
 static void __setup_syscalls() {
   syscall[SYSCALL_WRITE] = __write;
   syscall[SYSCALL_READ] = __keyboard_key;
-	syscall[SYSCALL_CLEAN_SCREEN] = __clear_screen;
+  syscall[SYSCALL_CLEAN_SCREEN] = __clear_screen;
+	syscall[SYSCALL_SET_COLOR] = __set_color;
 }
 
 void __syscall_dispatcher(int id, uint64_t first_parameter, uint64_t second_parameter) {

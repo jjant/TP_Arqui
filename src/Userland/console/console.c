@@ -15,10 +15,15 @@
 static struct program_s	programs[] = {
 	{"QUIT", shell_quit},
 	{"CLS", shell_clean},
+	{"COLOR", shell_color},
+	{"COLORSCHEME", shell_colorscheme},
 	{"HELP", shell_help},
 	{"ECHO", shell_echo},
+	{"", shell_null},
 	{NULL, shell_invalid_input}	// invalid input program determines the end of the programs array.
 };
+
+static uint8_t console_color = 4;
 
 int main() {
 	shell_clean(NULL);
@@ -30,7 +35,7 @@ int main() {
 void console_loop() {
 	char command_history[HISTORY_SIZE][BUFFER_SIZE];
 	uint16_t command_history_index = 0;
-
+	
 	char command[BUFFER_SIZE] = { 0 };
 	uint16_t current_index = 0;
 	int c;
@@ -38,7 +43,7 @@ void console_loop() {
 	while(1) {
 		char args[MAX_ARG_LEN][MAX_ARGS]; //maybe use dynamic memory for this later.
 
-		puts("$ > ");
+		print_shell_icon(&console_color);
 		
 		while((c = getchar()) != '\n') {
 			if(c == BACKSPACE) {
@@ -56,6 +61,15 @@ void console_loop() {
 		clean_buffer(command, current_index);
 		current_index = 0;
 	}
+}
+
+void print_shell_icon() {
+	uint8_t color = set_color(console_color);
+	putc(' ');
+	puts("Rama's PC ");
+	putc(26);
+	putc(' ');
+	set_color(color);
 }
 
 char ** parse_input(char * kb_buffer, char args[][MAX_ARGS]) {
@@ -99,32 +113,70 @@ uint16_t execute_program(struct program_s * programs, char args[][MAX_ARGS]) {
 	}
 	ret_val = current.fnc(args);
 
-	clean_up:	putc('\n');
+	clean_up:	//putc('\n');
 	return ret_val;
 }
 
-uint16_t shell_invalid_input(const char ** args) {
-	puts("Invalid input detected.");
+uint16_t shell_invalid_input(const char args[][MAX_ARGS]) {
+	puts(" Invalid input detected.");
+	putc('\n');
 	return SHELL_OK;
 }
 
-uint16_t shell_quit(const char ** args) {
-	puts("Quitting shell.");
+uint16_t shell_quit(const char args[][MAX_ARGS]) {
+	puts(" Quitting shell.");
+	putc('\n');
 	return SHELL_QUIT;
 }
 
-uint16_t shell_help(const char ** args) {
-	puts("Este es el program help.");
+uint16_t shell_help(const char args[][MAX_ARGS]) {
+	puts(" Este es el program help.");
+	putc('\n');
 	return SHELL_OK;
 }
 
-uint16_t shell_echo(const char ** args) {
-	puts("Este es el programa echo.");
+uint16_t shell_echo(const char args[][MAX_ARGS]) {
+	puts(" Este es el programa echo.");
+	putc('\n');
 	return SHELL_OK;
 }
 
-uint16_t shell_clean(const char ** args) {
+uint16_t shell_color(const char args[][MAX_ARGS]) {
+	
+	if(strcmp(args[1], "ROJO") == 0) set_color(4);
+	else if(strcmp(args[1], "AMARILLO") == 0) set_color(14);
+	else if(strcmp(args[1], "LIMA") == 0) set_color(10);
+	else if(strcmp(args[1], "TURQUESA") == 0) set_color(9);
+	else if(strcmp(args[1], "GRIS") == 0) set_color(8);
+	else if(strcmp(args[1], "BLANCO") == 0) set_color(7);
+	else if(strcmp(args[1], "NARANJA") == 0) set_color(6);
+	else if(strcmp(args[1], "FUCSIA") == 0) set_color(5);
+	else if(strcmp(args[1], "CELESTE") == 0) set_color(3);
+	else if(strcmp(args[1], "VERDE") == 0) set_color(2);
+	else if(strcmp(args[1], "AZUL") == 0) set_color(1);
+	else if(strcmp(args[1], "NEGRO") == 0) set_color(0);
+	else puts("Color no detectado. \n");
+
+	return SHELL_OK;
+}
+
+uint16_t shell_colorscheme(const char args[][MAX_ARGS]) {
+	
+	if(strcmp(args[1], "RIBER") == 0) { set_color(7); console_color = 4; }
+	else if(strcmp(args[1], "BOCA") == 0) { set_color(1); console_color = 14; }
+	else if(strcmp(args[1], "PATRIA") == 0) { set_color(3); console_color = 7; }
+	else puts("Esquema de color no encontrado. \n");
+
+	return SHELL_OK;
+}
+
+uint16_t shell_clean(const char args[][MAX_ARGS]) {
 	cls();
+	return SHELL_OK;
+}
+
+uint16_t shell_null(const char args[][MAX_ARGS]) {
+	//putc('\n');
 	return SHELL_OK;
 }
 

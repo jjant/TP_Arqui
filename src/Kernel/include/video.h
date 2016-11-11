@@ -8,5 +8,6 @@ void __puts(const char *);
 void __clear_line(int);
 void __putc(int);
 void __new_line();
+uint8_t __set_color(uint8_t);
 
 #endif
