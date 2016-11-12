@@ -81,13 +81,15 @@ char ** parse_input(char * kb_buffer, char args[][MAX_ARGS]) {
 
 	int k = 0;
 	char * current = args[0];
+	uint8_t in_string = 0;
 
 	while(*kb_buffer) {
-		if(*kb_buffer != ' ') {
+		if (k > 0 && *kb_buffer == '\'')
+			in_string = in_string ? 0 : 1;
+		if(*kb_buffer != ' ' || in_string && *kb_buffer == ' ') {
 			*current = *kb_buffer;
 			current++;
-		}
-		else {
+		} else if (!in_string) {
 			*current = '\0';
 			k++;
 			current = args[k];
@@ -130,6 +132,7 @@ uint16_t shell_invalid_input(const char args[][MAX_ARGS]) {
 }
 
 uint16_t shell_quit(const char args[][MAX_ARGS]) {
+	puts(args[1]);
 	puts(" Quitting shell.");
 	putc('\n');
 	return SHELL_QUIT;
@@ -194,18 +197,18 @@ uint16_t shell_text(const char args[][MAX_ARGS]) {
 
 uint16_t shell_color(const char args[][MAX_ARGS]) {
 	
-	if(strcmp(args[1], "ROJO") == 0) set_color(4);
+	if(strcmp(args[1], "ROJO") == 0) 					set_color(4);
 	else if(strcmp(args[1], "AMARILLO") == 0) set_color(14);
-	else if(strcmp(args[1], "LIMA") == 0) set_color(10);
+	else if(strcmp(args[1], "LIMA") == 0) 		set_color(10);
 	else if(strcmp(args[1], "TURQUESA") == 0) set_color(9);
-	else if(strcmp(args[1], "GRIS") == 0) set_color(8);
-	else if(strcmp(args[1], "BLANCO") == 0) set_color(7);
-	else if(strcmp(args[1], "NARANJA") == 0) set_color(6);
-	else if(strcmp(args[1], "FUCSIA") == 0) set_color(5);
-	else if(strcmp(args[1], "CELESTE") == 0) set_color(3);
-	else if(strcmp(args[1], "VERDE") == 0) set_color(2);
-	else if(strcmp(args[1], "AZUL") == 0) set_color(1);
-	else if(strcmp(args[1], "NEGRO") == 0) set_color(0);
+	else if(strcmp(args[1], "GRIS") == 0) 		set_color(8);
+	else if(strcmp(args[1], "BLANCO") == 0) 	set_color(7);
+	else if(strcmp(args[1], "NARANJA") == 0) 	set_color(6);
+	else if(strcmp(args[1], "FUCSIA") == 0) 	set_color(5);
+	else if(strcmp(args[1], "CELESTE") == 0) 	set_color(3);
+	else if(strcmp(args[1], "VERDE") == 0) 		set_color(2);
+	else if(strcmp(args[1], "AZUL") == 0) 		set_color(1);
+	else if(strcmp(args[1], "NEGRO") == 0) 		set_color(0);
 	else puts("Color no detectado. \n");
 
 	return SHELL_OK;
@@ -213,8 +216,8 @@ uint16_t shell_color(const char args[][MAX_ARGS]) {
 
 uint16_t shell_colorscheme(const char args[][MAX_ARGS]) {
 	
-	if(strcmp(args[1], "RIBER") == 0) { set_color(7); console_color = 4; }
-	else if(strcmp(args[1], "BOCA") == 0) { set_color(1); console_color = 14; }
+	if(strcmp(args[1], "RIBER") == 0) { 			set_color(7); console_color = 4; }
+	else if(strcmp(args[1], "BOCA") == 0) { 	set_color(1); console_color = 14; }
 	else if(strcmp(args[1], "PATRIA") == 0) { set_color(3); console_color = 7; }
 	else puts("Esquema de color no encontrado. \n");
 
@@ -228,7 +231,7 @@ uint16_t shell_clean(const char args[][MAX_ARGS]) {
 
 uint16_t shell_language(const char args[][MAX_ARGS]) {
 
-	if(strcmp(args[1], "ENGLISH") == 0) set_keyboard_language(0);
+	if(strcmp(args[1], "ENGLISH") == 0) 		set_keyboard_language(0);
 	else if(strcmp(args[1], "EASTER") == 0) set_keyboard_language(1);
 	else if(strcmp(args[1], "DVORAK") == 0) set_keyboard_language(2);
 	else puts("Lenguaje no reconocido. \n");
