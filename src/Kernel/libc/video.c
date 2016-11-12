@@ -8,7 +8,6 @@ static uint8_t * const private_video = (uint8_t *) (0xB8000);
 static uint8_t * const video = (uint8_t *) (0xB8000 + 80 * 4);
 static uint8_t * current_video = (uint8_t *) (0xB8000 + 80 * 4);
 static uint8_t current_color = WHITE_COLOR;
-static uint8_t current_line = 1;
 static const int width = 80;
 static const int height = 23;
 
@@ -93,10 +92,7 @@ void __putc(int c) {
 	}
 	
 	if(c == '\n') {
-		uint8_t scroll_break = current_line == height || current_line > height && (current_line + height) % 10 == 0;
-		current_line++;
-
-		if (scroll_break) {
+		if ((current_video - video) / (2 * 80) == height - 1) {
 			__scroll();
 			return 0;
 		}

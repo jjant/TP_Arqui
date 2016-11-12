@@ -97,6 +97,7 @@ char ** parse_input(char * kb_buffer, char args[][MAX_ARGS]) {
 	}
 
 	*current = '\0';
+	args[k + 1][0] = '\0';
 	return args;
 }
 
@@ -134,15 +135,42 @@ uint16_t shell_quit(const char args[][MAX_ARGS]) {
 	return SHELL_QUIT;
 }
 
-uint16_t shell_help(const char args[][MAX_ARGS]) {
+uint16_t shell_echo(const char args[][MAX_ARGS]) {
 	puts(" Este es el program help.");
 	putc('\n');
 	return SHELL_OK;
 }
 
-uint16_t shell_echo(const char args[][MAX_ARGS]) {
-	puts(" Este es el programa echo.");
-	putc('\n');
+uint16_t shell_help(const char args[][MAX_ARGS]) {
+	
+	if (strcmp(args[1], "HELP") == 0) {
+		puts("Recurrencia, recursion o recursividad es la forma en la cual se especifica un proceso basado en su propia definicion\n");
+	} else if (strcmp(args[1], "COLOR") == 0) {
+		puts("Los colores disponibles son: AMARILLO, LIMA, TURQUESA, GRIS, BLANCO, NARANJA, FUCSIA, NARANJA, CELESTE, VERDE, AZUL y NEGRO.\n");
+	} else if (strcmp(args[1], "COLORSCHEME") == 0) {
+		puts("Los esquemas disponibles son: RIBER, BOCA y PATRIA.\n");
+	} else if (strcmp(args[1], "KEYBOARD") == 0) {
+		puts("Los teclados disponibles son: ENGLISH, DVORAK y EASTER. Presiona ESC para volver al teclado default.\n");
+	} else if (strcmp(args[1], "CLS") == 0) {
+		puts("No recibe parametros.\n");
+	} else if (strcmp(args[1], "TEXT") == 0) {
+		puts("Presiona ESC para salir del editor.\n");
+	} else {
+		puts(" HELP -- Ayuda al usuario \n\n");
+		
+		puts(" 1. SO es case sensitive. No seas brusco.\n");
+		puts(" 2. SO es case simple. No la compliques.\n");
+		puts(" 3. SO es mas que aprobable. Hacele honor.\n\n");
+
+		puts(" COLOR <COLOR>: Cambia el color del texto\n");
+		puts(" COLORSCHEME <SCHEME>: Cambia el color del esquema de la consola\n");
+		puts(" KEYBOARD <KEYBOARD>: Cambia el teclado\n");
+		puts(" CLS: Limpia la pantalla\n");
+		puts(" TEXT: Editor de texto basico\n\n");
+		
+		puts(" Para saber mas de un programa, usa HELP <PROGRAMA>\n");
+	}
+
 	return SHELL_OK;
 }
 

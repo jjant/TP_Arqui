@@ -34,7 +34,13 @@ static uint8_t current_keyboard = 0;
 
 char __push_key() {
   static uint8_t caps = 1;
-	char key = code_to_char(__getchar());
+  static uint8_t shift = 0;
+  int keycode = __getchar();
+
+  if (keycode == 0x2A || keycode == 0x36) shift = 1;
+  if (keycode == 0xAA || keycode == 0xB6) shift = 0;
+
+	char key = code_to_char(keycode);
   uint8_t isChar = key >= 'A' && key <= 'Z';
   
   // BEHAVIOR KEYS
@@ -48,8 +54,9 @@ char __push_key() {
   }
 
   // CAPS MANAGEMENT
-  if (isChar && caps)
+  if (isChar && (caps && shift || !caps && !shift)) {
     key = key - 'A' + 'a';
+  }
 
   buffer[last_pos++] = key;
   last_pos %= BUFFER_SIZE;
