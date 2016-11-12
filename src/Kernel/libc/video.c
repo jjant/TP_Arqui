@@ -7,6 +7,7 @@
 static uint8_t * const video = (uint8_t *) 0xB8000;
 static uint8_t * current_video = (uint8_t *) 0xB8000;
 static uint8_t current_color = WHITE_COLOR;
+static uint8_t current_line = 1;
 static const int width = 80;
 static const int height = 25;
 
@@ -24,12 +25,23 @@ void __clear_line(int line) {
 		video[2 * (i + (line * width))] = ' ';
 	}
 }
-/*
+
 void __scroll() {
-	for(int i = 0; i < height - 15; i++) {
-		video[]
+	int i; 
+	
+	// Copy last lines in the beggining
+	for(i = width * 2 * 10; i < width * height * 2; i++) {
+		video[i - width * 2 * 10] = video[i];
 	}
-}*/
+	
+	// Clean last lines
+	for(i = width * 2 * (height - 10); i < width * height * 2; i += 2) {
+		video[i] = ' ';
+	}
+
+	// Relocate cursor
+	current_video = video + width * 2 * (height - 10);
+}
 
 uint8_t __set_color(uint8_t color) {
 	uint8_t color_aux = current_color;
@@ -51,8 +63,17 @@ void __putc(int c) {
 		return;
 	}
 	
-	if(c == '\n')
+	if(c == '\n') {
+		uint8_t scroll_break = current_line == 25 || current_line > 25 && (current_line + 25) % 10 == 0;
+		current_line++;
+
+		if (scroll_break) {
+			__scroll();
+			return 0;
+		}
+
 		return __new_line();
+	}
 
 	*current_video = c;
 	current_video++;
