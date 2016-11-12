@@ -7,6 +7,7 @@
 #include <handler.h>
 #include <keyboard.h>
 #include <kernel_initializer.h>
+#include <ethernet.h>
 
 typedef int (*EntryPoint)();
 
