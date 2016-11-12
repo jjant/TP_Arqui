@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+
 #define NULL (void *)0
 #define MAX_ARGS		50
 
@@ -18,18 +19,18 @@ void print_shell_icon();
 void cls();
 void private_line(char *);
 uint8_t set_color(uint8_t);
-char ** parse_input(char *, char [][MAX_ARGS]);
-uint16_t execute_program(struct program_s *, char [][MAX_ARGS]);
-uint16_t shell_invalid_input(const char [][MAX_ARGS]);
-uint16_t shell_quit(const char [][MAX_ARGS]);
-uint16_t shell_help(const char [][MAX_ARGS]);
-uint16_t shell_clean(const char [][MAX_ARGS]);
-uint16_t shell_color(const char [][MAX_ARGS]);
-uint16_t shell_language(const char [][MAX_ARGS]);
-uint16_t shell_text(const char [][MAX_ARGS]);
-uint16_t shell_colorscheme(const char [][MAX_ARGS]);
-uint16_t shell_null(const char [][MAX_ARGS]);
-uint16_t shell_echo(const char [][MAX_ARGS]);
+char ** parse_input(char *, char **);
+uint16_t execute_program(struct program_s *, char **);
+uint16_t shell_invalid_input(const char **);
+uint16_t shell_quit(const char **);
+uint16_t shell_help(const char **);
+uint16_t shell_clean(const char **);
+uint16_t shell_color(const char **);
+uint16_t shell_language(const char **);
+uint16_t shell_text(const char **);
+uint16_t shell_colorscheme(const char **);
+uint16_t shell_null(const char **);
+uint16_t shell_echo(const char **);
 void clean_buffer(char *, uint16_t);
 
 #endif

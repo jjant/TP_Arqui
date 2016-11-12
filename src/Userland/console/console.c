@@ -1,6 +1,7 @@
 #include <console.h>
 #include <string.h>
 #include <stdint.h>
+#include <memory.h>
 
 #define BUFFER_SIZE 128
 #define HISTORY_SIZE 20
@@ -38,13 +39,19 @@ int main() {
 void console_loop() {
 	char command_history[HISTORY_SIZE][BUFFER_SIZE];
 	uint16_t command_history_index = 0;
-	
+
 	char command[BUFFER_SIZE] = { 0 };
 	uint16_t current_index = 0;
 	int c;
 	private_line("CONSOLE");
+
 	while(1) {
-		char args[MAX_ARG_LEN][MAX_ARGS]; //maybe use dynamic memory for this later.
+		
+		char ** args = malloc(MAX_ARGS * sizeof (char *));
+		for(int i = 0; i < MAX_ARGS; i++) {
+			void * aux = malloc(MAX_ARG_LEN);
+			args[i] = (char *) aux;
+		}
 
 		print_shell_icon(&console_color);
 		
@@ -77,7 +84,7 @@ void print_shell_icon() {
 	set_color(color);
 }
 
-char ** parse_input(char * kb_buffer, char args[][MAX_ARGS]) {
+char ** parse_input(char * kb_buffer, char ** args) {
 
 	int k = 0;
 	char * current = args[0];
@@ -99,11 +106,11 @@ char ** parse_input(char * kb_buffer, char args[][MAX_ARGS]) {
 	}
 
 	*current = '\0';
-	args[k + 1][0] = '\0';
+	//args[k + 1][0] = '\0';
 	return args;
 }
 
-uint16_t execute_program(struct program_s * programs, char args[][MAX_ARGS]) {
+uint16_t execute_program(struct program_s * programs, char ** args) {
 	int i = 0;
 	struct program_s current = programs[i];
 	uint16_t ret_val;
@@ -125,26 +132,26 @@ uint16_t execute_program(struct program_s * programs, char args[][MAX_ARGS]) {
 	return ret_val;
 }
 
-uint16_t shell_invalid_input(const char args[][MAX_ARGS]) {
+uint16_t shell_invalid_input(const char ** args) {
 	puts(" Invalid input detected.");
 	putc('\n');
 	return SHELL_OK;
 }
 
-uint16_t shell_quit(const char args[][MAX_ARGS]) {
+uint16_t shell_quit(const char ** args) {
 	puts(args[1]);
 	puts(" Quitting shell.");
 	putc('\n');
 	return SHELL_QUIT;
 }
 
-uint16_t shell_echo(const char args[][MAX_ARGS]) {
+uint16_t shell_echo(const char ** args) {
 	puts(" Este es el program help.");
 	putc('\n');
 	return SHELL_OK;
 }
 
-uint16_t shell_help(const char args[][MAX_ARGS]) {
+uint16_t shell_help(const char ** args) {
 	
 	if (strcmp(args[1], "HELP") == 0) {
 		puts("Recurrencia, recursion o recursividad es la forma en la cual se especifica un proceso basado en su propia definicion\n");
@@ -180,7 +187,7 @@ uint16_t shell_help(const char args[][MAX_ARGS]) {
 	return SHELL_OK;
 }
 
-uint16_t shell_text(const char args[][MAX_ARGS]) {
+uint16_t shell_text(const char ** args) {
 	char c;
 	cls();
 	
@@ -195,7 +202,7 @@ uint16_t shell_text(const char args[][MAX_ARGS]) {
 	return SHELL_OK;
 }
 
-uint16_t shell_color(const char args[][MAX_ARGS]) {
+uint16_t shell_color(const char ** args) {
 	
 	if(strcmp(args[1], "ROJO") == 0) 					set_color(4);
 	else if(strcmp(args[1], "AMARILLO") == 0) set_color(14);
@@ -214,7 +221,7 @@ uint16_t shell_color(const char args[][MAX_ARGS]) {
 	return SHELL_OK;
 }
 
-uint16_t shell_colorscheme(const char args[][MAX_ARGS]) {
+uint16_t shell_colorscheme(const char ** args) {
 	
 	if(strcmp(args[1], "RIBER") == 0) { 			set_color(7); console_color = 4; }
 	else if(strcmp(args[1], "BOCA") == 0) { 	set_color(1); console_color = 14; }
@@ -224,12 +231,12 @@ uint16_t shell_colorscheme(const char args[][MAX_ARGS]) {
 	return SHELL_OK;
 }
 
-uint16_t shell_clean(const char args[][MAX_ARGS]) {
+uint16_t shell_clean(const char ** args) {
 	cls();
 	return SHELL_OK;
 }
 
-uint16_t shell_language(const char args[][MAX_ARGS]) {
+uint16_t shell_language(const char ** args) {
 
 	if(strcmp(args[1], "ENGLISH") == 0) 		set_keyboard_language(0);
 	else if(strcmp(args[1], "EASTER") == 0) set_keyboard_language(1);
@@ -239,7 +246,7 @@ uint16_t shell_language(const char args[][MAX_ARGS]) {
 	return SHELL_OK;
 }
 
-uint16_t shell_null(const char args[][MAX_ARGS]) {
+uint16_t shell_null(const char ** args) {
 	//putc('\n');
 	return SHELL_OK;
 }
