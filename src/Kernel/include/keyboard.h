@@ -11,6 +11,7 @@ void __print_key_pressed();
 char __key_pressed();
 char __push_key();
 void __flush();
+void __change_keyboard(uint8_t);
 char __pop_key();
 static char code_to_char(int);
 

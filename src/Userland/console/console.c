@@ -17,6 +17,7 @@ static struct program_s	programs[] = {
 	{"CLS", shell_clean},
 	{"COLOR", shell_color},
 	{"COLORSCHEME", shell_colorscheme},
+	{"KEYBOARD", shell_language},
 	{"HELP", shell_help},
 	{"ECHO", shell_echo},
 	{"", shell_null},
@@ -172,6 +173,16 @@ uint16_t shell_colorscheme(const char args[][MAX_ARGS]) {
 
 uint16_t shell_clean(const char args[][MAX_ARGS]) {
 	cls();
+	return SHELL_OK;
+}
+
+uint16_t shell_language(const char args[][MAX_ARGS]) {
+
+	if(strcmp(args[1], "ENGLISH") == 0) set_keyboard_language(0);
+	else if(strcmp(args[1], "EASTER") == 0) set_keyboard_language(1);
+	else if(strcmp(args[1], "DVORAK") == 0) set_keyboard_language(2);
+	else puts("Lenguaje no reconocido. \n");
+
 	return SHELL_OK;
 }
 

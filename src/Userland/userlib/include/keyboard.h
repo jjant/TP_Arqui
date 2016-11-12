@@ -4,6 +4,7 @@
 #include <string.h>
 
 char getchar_asm();
+void set_keyboard_language(uint8_t);
 char getchar();
 
 #endif

@@ -5,20 +5,42 @@
 #define BACKSPACE 0x0E
 #define CAPS 0x3B
 
-static unsigned char keycode_to_char[] = {
-  '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', BACKSPACE, '\t',
+static unsigned char keyboard_easteregg[] = {
+  1, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', BACKSPACE, '\t',
+  'Q', 'U', 'I', 'E', 'R', 'O', ' ', 'A', 'P', 'R', '[',  ']', '\n', '\0',
+  'O', 'B', 'A', 'R', ' ', 'A', 'R', 'Q', 'U', ';', '\'', '`', '\0', '\\',
+  'I', ' ', 'P', 'L', 'I', 'S', '!', ',', '.', '/', '\0', '*', '\0', ' ', CAPS,
+};
+
+static unsigned char keyboard_english[] = {
+  1, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', BACKSPACE, '\t',
   'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[',  ']', '\n', '\0',
   'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', '\'', '`', '\0', '\\',
   'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/', '\0', '*', '\0', ' ', CAPS,
 };
+
+static unsigned char keyboard_dvorak[] = {
+  1, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', BACKSPACE, '\t',
+  '\'', ',', '.', 'P', 'Y', 'F', 'G', 'C', 'R', 'L', '?',  '+', '\n', '\0',
+  'A', 'O', 'E', 'U', 'I', 'D', 'H', 'T', 'N', 'S', '\'', '`', '\0', '\\',
+  ';', 'Q', 'J', 'K', 'X', 'B', 'M', 'W', 'V', 'Z', '\0', '*', '\0', ' ', CAPS,
+};
+
 static char buffer[BUFFER_SIZE] = {0};
 static uint8_t last_pos = 0;
 static uint8_t first_pos = 0;
+
+static uint8_t current_keyboard = 0;
 
 char __push_key() {
   static uint8_t caps = 1;
 	char key = code_to_char(__getchar());
   uint8_t isChar = key >= 'A' && key <= 'Z';
+  
+  if (key == 1 && current_keyboard != 0) {
+    current_keyboard = 0;
+    return 0;
+  }
   
   // BEHAVIOR KEYS
   switch(key){
@@ -66,12 +88,17 @@ char __key_pressed() {
 	}
 }
 
+void __change_keyboard(uint8_t keyboard_code) {
+  current_keyboard = keyboard_code;
+}
+
 static char code_to_char(int keycode) {
-	char Q_code = 0x2;
+	char Q_code = 0x1;
 	char SPACE_code = 0x3A;
 
-	if(keycode >= Q_code && keycode <= SPACE_code)
-		return keycode_to_char[keycode - Q_code];
-	else
-		return 0;
+	if(keycode >= Q_code && keycode <= SPACE_code) {
+    if (current_keyboard == 1) return keyboard_easteregg[keycode - Q_code];
+    if (current_keyboard == 2) return keyboard_dvorak[keycode - Q_code];
+    return keyboard_english[keycode - Q_code];
+  } else return 0;
 }
