@@ -16,6 +16,7 @@ struct program_s {
 void console_loop();
 void print_shell_icon();
 void cls();
+void private_line(char *);
 uint8_t set_color(uint8_t);
 char ** parse_input(char *, char [][MAX_ARGS]);
 uint16_t execute_program(struct program_s *, char [][MAX_ARGS]);

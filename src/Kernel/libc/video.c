@@ -4,12 +4,13 @@
 #define WHITE_COLOR 7;
 #define RED_COLOR 4
 
-static uint8_t * const video = (uint8_t *) 0xB8000;
-static uint8_t * current_video = (uint8_t *) 0xB8000;
+static uint8_t * const private_video = (uint8_t *) (0xB8000);
+static uint8_t * const video = (uint8_t *) (0xB8000 + 80 * 4);
+static uint8_t * current_video = (uint8_t *) (0xB8000 + 80 * 4);
 static uint8_t current_color = WHITE_COLOR;
 static uint8_t current_line = 1;
 static const int width = 80;
-static const int height = 25;
+static const int height = 23;
 
 void __clear_screen() {
 	int i;
@@ -23,6 +24,33 @@ void __clear_line(int line) {
 	int i;
 	for(i = 0; i < width; i++) {
 		video[2 * (i + (line * width))] = ' ';
+	}
+}
+
+static void private_line_paint() {
+	// Color private line
+	int i;
+	for (i = 1; i < width * 2; i += 2) {
+		private_video[i] = current_color << 4;
+	}
+
+}
+
+void __private_line(char * str) {
+	int i;
+
+	// Clean private line
+	for(i = 0; i < width * 2; i += 2) {
+		private_video[i] = ' ';
+	}
+
+	private_line_paint();
+
+	// Copy text
+	i = 0;
+	while(*str) {
+		private_video[i += 2] = *str;
+		str++;
 	}
 }
 
@@ -46,6 +74,7 @@ void __scroll() {
 uint8_t __set_color(uint8_t color) {
 	uint8_t color_aux = current_color;
 	current_color = color;
+	private_line_paint();
 	return color_aux; 
 }
 
@@ -64,7 +93,7 @@ void __putc(int c) {
 	}
 	
 	if(c == '\n') {
-		uint8_t scroll_break = current_line == 25 || current_line > 25 && (current_line + 25) % 10 == 0;
+		uint8_t scroll_break = current_line == height || current_line > height && (current_line + height) % 10 == 0;
 		current_line++;
 
 		if (scroll_break) {

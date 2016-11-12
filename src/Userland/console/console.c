@@ -42,7 +42,7 @@ void console_loop() {
 	char command[BUFFER_SIZE] = { 0 };
 	uint16_t current_index = 0;
 	int c;
-
+	private_line("CONSOLE");
 	while(1) {
 		char args[MAX_ARG_LEN][MAX_ARGS]; //maybe use dynamic memory for this later.
 
@@ -59,6 +59,7 @@ void console_loop() {
 		}
 
 		parse_input(command, args);
+		private_line(args[0]);
 		execute_program(programs, args);	// args[0] is the name of the program to run.
 
 		copy_buffer(command_history[command_history_index++ % HISTORY_SIZE], command, current_index);
@@ -155,7 +156,8 @@ uint16_t shell_text(const char args[][MAX_ARGS]) {
 		else if (c == ESC) break;
 		else if (c) putc(c);
 	}
-
+	
+	putc('\n');
 	return SHELL_OK;
 }
 
