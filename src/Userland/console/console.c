@@ -153,6 +153,8 @@ uint16_t shell_help(const char args[][MAX_ARGS]) {
 		puts("Los teclados disponibles son: ENGLISH, DVORAK y EASTER. Presiona ESC para volver al teclado default.\n");
 	} else if (strcmp(args[1], "CLS") == 0) {
 		puts("No recibe parametros.\n");
+	} else if (strcmp(args[1], "BEATLES") == 0) {
+		puts(" Help! I need somebody\n");puts(" Help! not just anybody\n");puts(" Help! you know i need someone\n");puts(" Help! when i was younger, so much younger than today\n");puts(" I never needed anybody's help in any way\n");puts(" But now these days are gone i'm not so self assured\n");puts(" Now i findi've changed my mind, i've opened up the doors\n");puts(" Help me if you can, i'm feeling down\n");puts(" And i do appreciate you being 'round\n");puts(" Help me get my feet back on the ground\n");puts(" Won't you please, please help me?\n");puts(" And now my life has changed in oh so many ways\n");puts(" My independence seems to vanish in the haze\n");puts(" But every now and then i feel so insecure\n");puts(" I know that i just need you like i've never done before\n");
 	} else if (strcmp(args[1], "TEXT") == 0) {
 		puts("Presiona ESC para salir del editor.\n");
 	} else {
@@ -166,7 +168,8 @@ uint16_t shell_help(const char args[][MAX_ARGS]) {
 		puts(" COLORSCHEME <SCHEME>: Cambia el color del esquema de la consola\n");
 		puts(" KEYBOARD <KEYBOARD>: Cambia el teclado\n");
 		puts(" CLS: Limpia la pantalla\n");
-		puts(" TEXT: Editor de texto basico\n\n");
+		puts(" TEXT: Editor de texto basico\n");
+		puts(" BEATLES: Una buena cancion\n\n");
 		
 		puts(" Para saber mas de un programa, usa HELP <PROGRAMA>\n");
 	}

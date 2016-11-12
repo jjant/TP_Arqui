@@ -26,6 +26,10 @@ static unsigned char keyboard_dvorak[] = {
   ';', 'Q', 'J', 'K', 'X', 'B', 'M', 'W', 'V', 'Z', '\0', '*', '\0', ' ', CAPS,
 };
 
+static unsigned char special_keys[] = {
+  ')', '!', '@', '#', '$', '?', '^', '&', '*', '('
+};
+
 static char buffer[BUFFER_SIZE] = {0};
 static uint8_t last_pos = 0;
 static uint8_t first_pos = 0;
@@ -42,6 +46,7 @@ char __push_key() {
 
 	char key = code_to_char(keycode);
   uint8_t isChar = key >= 'A' && key <= 'Z';
+  uint8_t isNumeric = key >= '0' && key <= '9';
   
   // BEHAVIOR KEYS
   switch(key){
@@ -56,6 +61,8 @@ char __push_key() {
   // CAPS MANAGEMENT
   if (isChar && (caps && shift || !caps && !shift)) {
     key = key - 'A' + 'a';
+  } else if (isNumeric && shift) {
+    key = special_keys[key - '0'];
   }
 
   buffer[last_pos++] = key;
