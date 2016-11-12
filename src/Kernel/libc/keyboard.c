@@ -37,11 +37,6 @@ char __push_key() {
 	char key = code_to_char(__getchar());
   uint8_t isChar = key >= 'A' && key <= 'Z';
   
-  if (key == 1 && current_keyboard != 0) {
-    current_keyboard = 0;
-    return 0;
-  }
-  
   // BEHAVIOR KEYS
   switch(key){
     case 0: return 0;

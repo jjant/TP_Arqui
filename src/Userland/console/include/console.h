@@ -25,6 +25,7 @@ uint16_t shell_help(const char [][MAX_ARGS]);
 uint16_t shell_clean(const char [][MAX_ARGS]);
 uint16_t shell_color(const char [][MAX_ARGS]);
 uint16_t shell_language(const char [][MAX_ARGS]);
+uint16_t shell_text(const char [][MAX_ARGS]);
 uint16_t shell_colorscheme(const char [][MAX_ARGS]);
 uint16_t shell_null(const char [][MAX_ARGS]);
 uint16_t shell_echo(const char [][MAX_ARGS]);

@@ -11,12 +11,14 @@
 #define SHELL_OK		0
 
 #define BACKSPACE 0x0E
+#define ESC 0x01
 
 static struct program_s	programs[] = {
 	{"QUIT", shell_quit},
 	{"CLS", shell_clean},
 	{"COLOR", shell_color},
 	{"COLORSCHEME", shell_colorscheme},
+	{"TEXT", shell_text},
 	{"KEYBOARD", shell_language},
 	{"HELP", shell_help},
 	{"ECHO", shell_echo},
@@ -52,6 +54,7 @@ void console_loop() {
 				putc(BACKSPACE);
 				command[--current_index] = 0;
 			}
+			else if (c == ESC) set_keyboard_language(0);
 			else if (c) putc(command[current_index++] = c);
 		}
 
@@ -139,6 +142,20 @@ uint16_t shell_help(const char args[][MAX_ARGS]) {
 uint16_t shell_echo(const char args[][MAX_ARGS]) {
 	puts(" Este es el programa echo.");
 	putc('\n');
+	return SHELL_OK;
+}
+
+uint16_t shell_text(const char args[][MAX_ARGS]) {
+	char c;
+	cls();
+	
+	while(1) {
+		c = getchar();
+		if(c == BACKSPACE) putc(BACKSPACE);
+		else if (c == ESC) break;
+		else if (c) putc(c);
+	}
+
 	return SHELL_OK;
 }
 
