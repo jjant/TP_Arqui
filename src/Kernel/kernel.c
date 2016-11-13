@@ -14,24 +14,22 @@ typedef int (*EntryPoint)();
 
 int main() {
 	__new_line();
-	__puts("[Initializing interrupt handlers]");
-	__IDT_add_handler(0x20, (uint64_t) irq0Handler);
-	__IDT_add_handler(0x21, (uint64_t) irq1Handler);
+	__puts("[Initializing IDT]\n");
+	__initialize_IDT();
+	__puts("[Initializing interrupt handlers]\n");
 	__initialize_handlers();
-	__new_line();
+	__puts("[Initializing syscall vector]\n");
 	__initialize_syscall_vector();
-	__puts("[Initializing syscall vector]");
-	__new_line();
 
 	setPicMaster(0xFC);
 	sti();
 
-	__puts("[Starting console...]");
-	__new_line();
-	__new_line();
+	__puts("[Starting console...]\n");
 	
+	//print_all_devices();
+	//__int_11();
 	//findRTL();
-	((EntryPoint)0x400000)(); // Start the console
+	//((EntryPoint)0x400000)(); // Start the console
 
 	return 0;
 }

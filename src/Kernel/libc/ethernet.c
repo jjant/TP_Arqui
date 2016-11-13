@@ -12,7 +12,7 @@
 
 #define rtl_vendor_id 0x10EC
 #define rtl_device_id 0x8139
-
+#define rtl_interrupt 0x0B;
 
 static void __reset();
 static void __turn_on_rtl();
@@ -69,8 +69,8 @@ void __clear_interrupt_rtl() {
 
 void __rtl_handler() {
   /* Do stuff */
-
-
+  __puts("Me llego algo\n");
+  
   __clear_interrupt_rtl();
 }
 

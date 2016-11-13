@@ -3,12 +3,16 @@ GLOBAL sti
 GLOBAL setPicMaster
 GLOBAL irq0Handler
 GLOBAL irq1Handler
+GLOBAL irq11Handler
 
 EXTERN __irq_dispatcher
 
 %include "./asm/macros.m"
 
 section .text
+
+irq11Handler:
+	irqHandler 11
 
 irq1Handler:
 	irqHandler 1

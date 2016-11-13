@@ -6,6 +6,8 @@
 #define RED_COLOR 4
 
 static uint32_t __uint_to_base(uint64_t, char *, uint32_t);
+static void private_line_paint();
+
 static uint8_t * const private_video = (uint8_t *) (0xB8000);
 static uint8_t * const video = (uint8_t *) (0xB8000 + 80 * 4);
 static uint8_t * current_video = (uint8_t *) (0xB8000 + 80 * 4);

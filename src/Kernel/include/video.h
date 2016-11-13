@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-static void private_line_paint();
 void __clear_screen();
 void __puts(const char *);
 void __clear_line(int);

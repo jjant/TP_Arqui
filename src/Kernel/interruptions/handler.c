@@ -1,6 +1,7 @@
 #include <handler.h>
 #include <keyboard.h>
 #include <video.h>
+#include <ethernet.h>
 
 typedef void (*handler_t)(void);
 
@@ -14,8 +15,9 @@ void __key_handler() {
 }
 
 void __initialize_handlers() {
-  handlers[0] = __tick_handler;
-	handlers[1] = __key_handler;
+  handlers[0]  = __tick_handler;
+	handlers[1]  = __key_handler;
+  handlers[11] = __rtl_handler;
 }
 
 void __irq_dispatcher(int irq) {

@@ -22,18 +22,6 @@ __outportb_asm:
   leave
   ret
 
-__inportb_asm:
-  push  rbp
-  mov   rbp, rsp
-
-  push  rdx
-
-  mov   dx, di
-  in    al, dx
-
-  pop   rdx
-  leave
-  ret
 
 ; __outportw(uint16_t port, uint16_t data)
 __outportw_asm:
@@ -91,20 +79,32 @@ __outport64_asm:
 ;  leave
   ret
 
-;__inportdw_asm(uint16_t port);
+
+;uint8_t __inportb_asm(uint16_t port);
+; port: RDI
+__inportb_asm:
+  push  rbp
+  mov   rbp, rsp
+  push  rdx
+
+  mov   dx, di
+  in    al, dx
+
+  pop   rdx
+  leave
+  ret
+
+
+;uint32_t __inportdw_asm(uint16_t port);
 ; port: RDI
 __inportdw_asm:
   push  rbp
   mov   rbp, rsp
   push  rbx
-  push  rax
 
-  mov rbx, rdi
-  mov rax, rsi
-  mov dx, bx
-  in eax, dx
+  mov   dx, di
+  in    eax, dx
 
-  pop   rax
   pop   rbx
   leave
   ret

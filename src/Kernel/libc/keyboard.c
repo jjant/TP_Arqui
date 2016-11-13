@@ -5,6 +5,8 @@
 #define BACKSPACE 0x0E
 #define CAPS 0x3B
 
+static char __code_to_char(int);
+
 static unsigned char keyboard_easteregg[] = {
   1, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', BACKSPACE, '\t',
   'Q', 'U', 'I', 'E', 'R', 'O', ' ', 'A', 'P', 'R', '[',  ']', '\n', '\0',
@@ -44,7 +46,7 @@ char __push_key() {
   if (keycode == 0x2A || keycode == 0x36) shift = 1;
   if (keycode == 0xAA || keycode == 0xB6) shift = 0;
 
-	char key = code_to_char(keycode);
+	char key = __code_to_char(keycode);
   uint8_t isChar = key >= 'A' && key <= 'Z';
   uint8_t isNumeric = key >= '0' && key <= '9';
   
@@ -93,7 +95,7 @@ char __key_pressed() {
 	int keycode = 0;
 	while(1) {
 		if(keycode = __key_pressed_asm())
-			return code_to_char(keycode);
+			return __code_to_char(keycode);
 	}
 }
 
@@ -101,7 +103,7 @@ void __change_keyboard(uint8_t keyboard_code) {
   current_keyboard = keyboard_code;
 }
 
-static char code_to_char(int keycode) {
+static char __code_to_char(int keycode) {
 	char Q_code = 0x1;
 	char SPACE_code = 0x3A;
 

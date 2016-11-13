@@ -3,6 +3,7 @@
 #include <ethernet.h>
 #include <ports.h>
 #include <memory.h>
+#include <video.h>
 
 static uint32_t cnfg_addr = 0xCF8;
 static uint32_t cnfg_data = 0xCFC;
@@ -46,7 +47,7 @@ PCI_Descriptor_t __get_descriptor(uint16_t bus, uint16_t device, uint16_t functi
   descriptor->device   = device;
   descriptor->function = function;
 
-  descriptor->vendor_id    = __pci_config_read_word(bus, device, function, 0x00)
+  descriptor->vendor_id    = __pci_config_read_word(bus, device, function, 0x00);
   descriptor->device_id    = __pci_config_read_word(bus, device, function, 0x02);
   descriptor->class_id     = __pci_config_read_word(bus, device, function, 0x0B);
   descriptor->subclass_id  = __pci_config_read_word(bus, device, function, 0x0A);
@@ -59,21 +60,29 @@ PCI_Descriptor_t __get_descriptor(uint16_t bus, uint16_t device, uint16_t functi
 
 void print_all_devices() {
   uint16_t bus, device, function;
-
-  for(bus = 0; bus < 8; bus++) {
+  __clear_screen();
+  for(bus = 0; bus < 256; bus++) {
     for(device = 0; device < 32; device++) {
       for(function = 0 ; function < 8; function++) {
         PCI_Descriptor_t descriptor = __get_descriptor(bus, device, function);
 
-        if(descriptor->vendor_id == 0x00 || descriptor->vendor_id == 0xFFFF)
-          return;
-
+        if(/*descriptor->vendor_id == 0x00 ||*/ descriptor->vendor_id == 0xFFFF)
+          break;
         __puts("PCI bus: ");
         __print_hex(bus & 0xFF);
-        __puts(" , devise: ");
+        __puts(", vendor_id: ");
+        __print_hex((descriptor->vendor_id & 0xFF00) >> 8);
+        __print_hex(descriptor->vendor_id & 0xFF);
+        __puts(", device_id: ");
+        __print_hex((descriptor->device_id & 0xFF00) >> 8);
+        __print_hex(descriptor->device_id & 0xFF);
+        __puts(", devise: ");
         __print_hex(device & 0xFF);
-        __puts(" , function: ");
+        __puts(", function: ");
         __print_hex(function & 0xFF);
+        __puts(", interrupt: ");
+        __print_hex(descriptor->interrupt & 0x0F);
+        __new_line();
       }
     }
   }
