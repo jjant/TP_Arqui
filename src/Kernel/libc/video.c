@@ -1,9 +1,11 @@
 #include <video.h>
+#include <stdint.h>
 
 #define BACKSPACE 0x0E
 #define WHITE_COLOR 7;
 #define RED_COLOR 4
 
+static uint32_t __uint_to_base(uint64_t, char *, uint32_t);
 static uint8_t * const private_video = (uint8_t *) (0xB8000);
 static uint8_t * const video = (uint8_t *) (0xB8000 + 80 * 4);
 static uint8_t * current_video = (uint8_t *) (0xB8000 + 80 * 4);
@@ -111,3 +113,42 @@ void __new_line() {
 		__putc(' ');
 	} while((uint64_t)(current_video - video) % (width * 2) != 0);
 }
+
+void __print_hex(uint64_t value) {
+	__print_base(value, 16);
+}
+
+void __print_base(uint64_t value, uint32_t base) {
+    __uint_to_base(value, buffer, base);
+    __puts(buffer);
+}
+
+static uint32_t __uint_to_base(uint64_t value, char * buffer, uint32_t base) {
+	char *p = buffer;
+	char *p1, *p2;
+	uint32_t digits = 0;
+
+	//Calculate characters for each digit
+	do {
+		uint32_t remainder = value % base;
+		*p++ = (remainder < 10) ? remainder + '0' : remainder + 'A' - 10;
+		digits++;
+	}	while (value /= base);
+
+	// Terminate string in buffer.
+	*p = 0;
+
+	//Reverse string in buffer.
+	p1 = buffer;
+	p2 = p - 1;
+	while (p1 < p2) {
+		char tmp = *p1;
+		*p1 = *p2;
+		*p2 = tmp;
+		p1++;
+		p2--;
+	}
+
+	return digits;
+}
+

@@ -10,6 +10,10 @@
 #define imr_reg       0x3C
 #define isr_reg       0x3E
 
+#define rtl_vendor_id 0x10EC
+#define rtl_device_id 0x8139
+
+
 static void __reset();
 static void __turn_on_rtl();
 static void __set_up_buffer();
@@ -68,4 +72,12 @@ void __rtl_handler() {
 
 
   __clear_interrupt_rtl();
+}
+
+uint16_t __rtl_vendor_id() {
+  return rtl_vendor_id;
+}
+
+uint16_t __rtl_device_id() {
+  return rtl_device_id;
 }
