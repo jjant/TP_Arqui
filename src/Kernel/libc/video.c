@@ -12,6 +12,7 @@ static uint8_t * current_video = (uint8_t *) (0xB8000 + 80 * 4);
 static uint8_t current_color = WHITE_COLOR;
 static const int width = 80;
 static const int height = 23;
+static char buffer[64];
 
 void __clear_screen() {
 	int i;

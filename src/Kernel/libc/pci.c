@@ -1,4 +1,7 @@
 #include <pci.h>
+#include <stdint.h>
+#include <ethernet.h>
+#include <ports.h>
 
 static uint32_t cnfg_addr = 0xCF8;
 static uint32_t cnfg_data = 0xCFC;
@@ -32,27 +35,8 @@ uint16_t __pci_check_vendor(uint8_t bus, uint8_t slot) {
 }
 
 // ROBADO DE MARCELO;
-
-typedef struct {
-            uint32_t portBase;
-            uint32_t interrupt;
-
-            uint8_t bus;
-            uint8_t device;
-            uint8_t function;
-
-            uint16_t vendor_id;
-            uint16_t device_id;
-
-            uint8_t class_id;
-            uint8_t subclass_id;
-            uint8_t interface_id;
-
-            uint8_t revision;
-
-        }PCIDescriptor_t;
-
-typedef PCIDescriptor_t * PCIDescriptor;
+#define INPUT_OUTPUT 1
+#define MEMORY_MAPPING 0
 
 void findRTL(){
   __clear_screen();
@@ -67,7 +51,9 @@ void findRTL(){
          uint16_t vendorID = descriptor.vendor_id;
          uint16_t deviceID = descriptor.device_id;
 
-         if(vendorID == RTL_VENDOR_ID || vendorID == RTL_DEVICE_ID){        // Device doesn't exist
+         printPCID(&descriptor);
+         __clear_screen();
+         if(vendorID == __rtl_vendor_id() || vendorID == __rtl_device_id()){        // Device doesn't exist
             PCIDescriptor d = &descriptor;
             __puts("Found RTL8139");
             __new_line();
@@ -80,6 +66,7 @@ void findRTL(){
             __puts("Interrupt pin 0x"); __print_hex((d->interrupt >> 8)& 0xFF); __new_line();
             __puts("Base port 0x"); __print_hex(d->portBase); __new_line();
             __new_line();
+            return;
          }
   }
   }
@@ -102,12 +89,77 @@ void printPCID(PCIDescriptor d){
     __print_hex(d->vendor_id & 0xFFFF);
 
     __puts(", Device ID: 0x"); 
-    __print_hex(d->device_id & 0xFFFF);
+    //__print_hex(d->device_id & 0xFFFF);
 
     __puts("Interrupt 0x");
-    __print_hex(d->interrupt);
+    //__print_hex(d->interrupt);
 
     __new_line();
 }
+
+PCIDescriptor_t getDescriptor(uint8_t bus, uint8_t device, uint8_t function){
+    PCIDescriptor_t result;
+    int barNum;
+
+    result.bus = bus;
+    result.device = device;
+    result.function = function;
+
+    result.vendor_id = __pci_config_read_word(bus, device, function, 0x00);
+    result.device_id = __pci_config_read_word(bus, device, function, 0x02);
+
+    result.class_id = __pci_config_read_word(bus, device, function, 0x0b);
+    result.subclass_id = __pci_config_read_word(bus, device, function, 0x0a);
+    result.interface_id = __pci_config_read_word(bus, device, function, 0x09);
+
+    result.revision = __pci_config_read_word(bus, device, function, 0x08);
+    result.interrupt = __pci_config_read_word(bus, device, function, 0x3c);
+
+    for(barNum = 0; barNum < 6; barNum++)
+                {
+                    BaseAddressRegister bar = getBAR(bus, device, function, barNum);
+                    if(bar.address && (bar.type == INPUT_OUTPUT))
+                        result.portBase = (uint32_t)bar.address;
+                }
+
+    return result;
+}
+
+BaseAddressRegister getBAR(uint8_t bus, uint8_t device, uint8_t function, uint16_t bar){
+
+    BaseAddressRegister result;
+    result.address = 0;
+
+    uint32_t headertype = __pci_config_read_word(bus, device, function, 0x0E) & 0x7F;
+    int maxBARs = 6 - (4*headertype);
+
+    if(bar >= maxBARs)
+        return result;
+
+    uint32_t bar_value = __pci_config_read_word(bus, device, function, 0x10 + 4*bar);
+    result.type = (bar_value & 0x1) ? INPUT_OUTPUT : MEMORY_MAPPING;
+    uint32_t temp;
+
+    if(result.type == MEMORY_MAPPING)
+    {
+        switch((bar_value >> 1) & 0x3)
+        {
+
+            case 0: // 32 Bit Mode
+            case 1: // 20 Bit Mode
+            case 2: // 64 Bit Mode
+                break;
+        }
+
+    }
+    else // INPUT_OUTPUT
+    {
+        result.address = (uint8_t*)(bar_value & ~0x3);
+    }
+
+
+    return result;
+}
+
 
 // Termina lo robado de marcelo.

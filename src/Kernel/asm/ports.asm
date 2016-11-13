@@ -3,6 +3,7 @@ GLOBAL __inportb_asm
 GLOBAL __outportw_asm
 GLOBAL __outportdw_asm
 GLOBAL __outport64_asm
+GLOBAL __inportdw_asm
 
 __outportb_asm:
   push  rbp
@@ -89,3 +90,22 @@ __outport64_asm:
 ;  pop   rdx
 ;  leave
   ret
+
+;__inportdw_asm(uint16_t port);
+; port: RDI
+__inportdw_asm:
+  push  rbp
+  mov   rbp, rsp
+  push  rbx
+  push  rax
+
+  mov rbx, rdi
+  mov rax, rsi
+  mov dx, bx
+  in eax, dx
+
+  pop   rax
+  pop   rbx
+  leave
+  ret
+

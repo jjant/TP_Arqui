@@ -8,6 +8,7 @@
 #include <keyboard.h>
 #include <kernel_initializer.h>
 #include <ethernet.h>
+#include <pci.h>
 
 typedef int (*EntryPoint)();
 
@@ -29,6 +30,7 @@ int main() {
 	__new_line();
 	__new_line();
 	
+	//findRTL();
 	((EntryPoint)0x400000)(); // Start the console
 
 	return 0;
