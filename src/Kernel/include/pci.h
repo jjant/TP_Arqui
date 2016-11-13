@@ -8,7 +8,7 @@ uint16_t __pci_check_vendor(uint8_t, uint8_t);
 
 // robado
 
-typedef struct {
+struct PCI_Descriptor{
             uint32_t portBase;
             uint32_t interrupt;
 
@@ -24,9 +24,9 @@ typedef struct {
             uint8_t interface_id;
 
             uint8_t revision;
-} PCIDescriptor_t;
+};
 
-typedef PCIDescriptor_t * PCIDescriptor;
+typedef struct PCI_Descriptor * PCI_Descriptor_t;
 
 typedef struct {
   uint8_t* address;
