@@ -1,5 +1,5 @@
 #include <memory.h>
-void * __reserve_memory(unsigned int size) {
+void * __malloc(unsigned int size) {
   static void * ptr = 0x90000;
 
   unsigned int i = 0;
