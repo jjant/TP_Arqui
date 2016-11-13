@@ -2,12 +2,6 @@
 #define __PCI_H
 
 #include <stdint.h>
-
-uint16_t __pci_config_read_word(uint8_t, uint8_t, uint8_t, uint8_t);
-uint16_t __pci_check_vendor(uint8_t, uint8_t);
-
-// robado
-
 struct PCI_Descriptor{
             uint32_t portBase;
             uint32_t interrupt;
@@ -34,10 +28,8 @@ typedef struct {
   uint8_t type;
 } BaseAddressRegister;
 
+uint16_t __pci_config_read_word(uint8_t, uint8_t, uint8_t, uint8_t);
+uint16_t __pci_check_vendor(uint8_t, uint8_t);
+PCI_Descriptor_t __get_descriptor(uint16_t, uint16_t, uint16_t);
 
-void findRTL();
-void printPCID(PCIDescriptor);
-PCIDescriptor_t getDescriptor(uint8_t bus, uint8_t device, uint8_t function);
-BaseAddressRegister getBAR(uint8_t bus, uint8_t device, uint8_t function, uint16_t bar);
-// ends robado
 #endif
