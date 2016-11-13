@@ -27,13 +27,15 @@ int main() {
 	__init_network();
 	__puts("   Done.\n");
 
-	setPicMaster(0xFC);
+	__set_pic_master(0xFC);
+	__set_pic_slave(0x0);	//enable everything
+
 	sti();
 
 	__puts("[Starting console]...\n");
 	
 	print_all_devices();
-	//__int_11();
+	__int_11();
 	//findRTL();
 	//((EntryPoint)0x400000)(); // Start the console
 

@@ -2,6 +2,10 @@
 #include <keyboard.h>
 #include <video.h>
 #include <ethernet.h>
+#include <stdint.h>
+
+void __set_pic_slave_asm(uint8_t);
+void __set_pic_slave_asm(uint8_t);
 
 typedef void (*handler_t)(void);
 
@@ -24,3 +28,10 @@ void __irq_dispatcher(int irq) {
 	handlers[irq]();
 }
 
+void __set_pic_master(uint8_t data) {
+  __set_pic_master_asm(data);
+}
+
+void __set_pic_slave(uint8_t data) {
+  __set_pic_slave_asm(data);
+}

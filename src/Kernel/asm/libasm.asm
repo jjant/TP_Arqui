@@ -1,6 +1,7 @@
 GLOBAL cpuVendor
 GLOBAL sti
-GLOBAL setPicMaster
+GLOBAL __set_pic_master_asm
+GLOBAL __set_pic_slave_asm
 GLOBAL irq0Handler
 GLOBAL irq1Handler
 GLOBAL irq11Handler
@@ -24,15 +25,26 @@ sti:
 	sti
 	ret
 	
-setPicMaster:
-	push rbp
-	mov rbp, rsp
+__set_pic_master_asm:
+	push	rbp
+	mov 	rbp, rsp
 	
-	mov rax, rdi
-	out 21h, al
-	
-	mov rsp, rbp
-	pop rbp
+	mov 	rax, rdi
+	out 	0x21, al
+
+	leave	
+	ret
+
+;__set_pic_slave_asm(uint8_t data)
+; data: RDI
+__set_pic_slave_asm:
+	push	rbp
+	mov		rbp, rsp
+
+	mov		rax, rdi
+	out		0xA1, al
+
+	leave
 	ret
 
 cpuVendor:
