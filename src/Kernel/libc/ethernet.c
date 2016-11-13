@@ -38,7 +38,7 @@ static void __turn_on_rtl() {
 
 static void __reset() {
 	__outportb(ioaddr + cmd_reg, 0x10);
-	while( (__inportb(cmd_reg) & 0x10) != 0);
+	//while( (__inportb(cmd_reg) & 0x10) != 0);
 }
 
 static void __set_up_buffer(void * buffer) {

@@ -14,19 +14,25 @@ typedef int (*EntryPoint)();
 
 int main() {
 	__new_line();
-	__puts("[Initializing IDT]\n");
+	__puts("[Initializing IDT]...");
 	__initialize_IDT();
-	__puts("[Initializing interrupt handlers]\n");
+	__puts("   Done.\n");
+	__puts("[Initializing interrupt handlers]...");
 	__initialize_handlers();
-	__puts("[Initializing syscall vector]\n");
+	__puts("   Done.\n");
+	__puts("[Initializing syscall vector]...");
 	__initialize_syscall_vector();
+	__puts("   Done.\n");
+	__puts("[Initializing ethernet device]...");
+	__init_network();
+	__puts("   Done.\n");
 
 	setPicMaster(0xFC);
 	sti();
 
-	__puts("[Starting console...]\n");
+	__puts("[Starting console]...\n");
 	
-	//print_all_devices();
+	print_all_devices();
 	//__int_11();
 	//findRTL();
 	//((EntryPoint)0x400000)(); // Start the console
