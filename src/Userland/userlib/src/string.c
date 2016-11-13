@@ -1,4 +1,9 @@
+#include <stdint.h>
+#include <stdarg.h>
+#include <memory.h>
 #include <string.h>
+#include <number.h>
+
 
 static void putc_asm(int *);
 
@@ -9,6 +14,13 @@ void putc(int c) {
 void puts(char * str) {
 	while(*str)
 		putc(*str++);
+}
+
+void putint(int value) {
+  void * aux = malloc(MAX_INT_LENGTH);
+  char * str = (char *) aux;
+  itoa(value, str);
+  puts(str);
 }
 
 void reverse(char * s) {
@@ -23,9 +35,9 @@ void reverse(char * s) {
  }
 
 int strlen(char * s) {
-    char * start = s;
-    while(*s != 0) s++;
-    return s - start;
+  char * start = s;
+  while(*s != 0) s++;
+  return s - start;
 }
 
 //returns 0 if both strings are equal, 1 if not (need to implement check for str1<str2 and >).
@@ -41,4 +53,44 @@ int strcmp(const char * str1, const char * str2) {
 
 void break_line() {
 	putc('\n');
+}
+
+uint8_t is_char(char c) {
+  return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
+}
+
+void printf(char * str, ...) {
+  int i = 0;
+  char * string_value;
+
+  va_list args;
+  va_start(args, str);
+
+  while (str[i] != '\0') {
+    char next_char = str[i + 1];
+    
+    if (is_char(str[i])) putc(str[i]);
+    else if (str[i] == '\\') putc(next_char == 'n' ? '\n' : '\\'); 
+    else if (str[i] == '%') {
+      if (next_char != 'c' && next_char != 'd' && next_char != 's') {
+        putc(str[i++]);
+        continue;
+      }
+
+      switch (next_char) {
+      case 'd': putint(va_arg(args, int)); break;
+      case 'c': putc(va_arg(args, char)); break;
+      case 's':
+        string_value = va_arg(args, char *);
+        for (int j = 0; string_value[j] != '\0'; j++) {
+          putc(string_value[j]);
+        }
+        break;
+      }
+      i++;
+    }
+    i++;
+  }
+
+  va_end(args);
 }

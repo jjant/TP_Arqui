@@ -54,7 +54,7 @@ void console_loop() {
 		}
 
 		print_shell_icon(&console_color);
-		
+
 		while((c = getchar()) != '\n') {
 			if(c == BACKSPACE) {
 				if (!current_index) continue;

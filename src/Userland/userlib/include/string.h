@@ -3,8 +3,8 @@
 
 void putc(int);
 void puts(char *);
-int strlen(char * s);
-void reverse(char * s);
+int strlen(char *);
+void reverse(char *);
 int strcmp(const char *, const char *);
 
 #endif
