@@ -1,6 +1,7 @@
 #include <ethernet.h>
 #include <ports.h>
 #include <stdint.h>
+#include <memory.h>
 
 #define ioaddr        0xC000
 #define cmd_reg       0x37
@@ -21,7 +22,8 @@ static void * rx_buffer;
 void __init_network() {
   __turn_on_rtl();
   __reset();
-  __set_up_buffer();
+  rx_buffer = __malloc(9000);
+  __set_up_buffer(rx_buffer);
   __promiscuous_rtl();
   __enable_receive_transmit();
 }
@@ -35,9 +37,9 @@ static void __reset() {
 	while( (__inportb(cmd_reg) & 0x10) != 0);
 }
 
-static void __set_up_buffer() {
+static void __set_up_buffer(void * buffer) {
   //change later
-  __outportdw(ioaddr + rbstart_reg, rx_buffer);
+  __outportdw(ioaddr + rbstart_reg, buffer);
 }
 
 // Only allows Transmit OK and Receive OK interrups.
