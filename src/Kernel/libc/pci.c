@@ -31,6 +31,25 @@ uint16_t __pci_config_read_word(uint8_t bus, uint8_t slot, uint8_t func, uint8_t
   return tmp;
 }
 
+void __pci_config_write(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset, uint32_t value) {
+  uint32_t address;
+  uint32_t lbus   = (uint32_t)bus;
+  uint32_t lslot  = (uint32_t)slot;
+  uint32_t lfunc  = (uint32_t)func;
+  uint16_t tmp = 0;
+
+  /* create configuration address as per Figure 1 */
+  address = (uint32_t)(
+            (lbus << 16)    |
+            (lslot << 11)   |
+            (lfunc << 8)    |
+            (offset & 0xFC) | 
+            ((uint32_t) 0x80000000));
+
+  __outportdw(cnfg_addr, address);
+  __outportdw(cnfg_data, value);
+}
+
 uint16_t __pci_check_vendor(uint8_t bus, uint8_t slot) {
   uint16_t vendor, device;
   /* If device is non-existent, the pci will return all ones. */
@@ -47,8 +66,10 @@ PCI_Descriptor_t __get_descriptor(uint16_t bus, uint16_t device, uint16_t functi
   descriptor->device   = device;
   descriptor->function = function;
 
+  __pci_config_write(bus, device, function, 0x04, 0x7);
   descriptor->vendor_id    = __pci_config_read_word(bus, device, function, 0x00);
   descriptor->device_id    = __pci_config_read_word(bus, device, function, 0x02);
+  descriptor->mastering    = __pci_config_read_word(bus, device, function, 0x04);
   descriptor->class_id     = __pci_config_read_word(bus, device, function, 0x0B);
   descriptor->subclass_id  = __pci_config_read_word(bus, device, function, 0x0A);
   descriptor->interface_id = __pci_config_read_word(bus, device, function, 0x09);
@@ -68,6 +89,7 @@ void print_all_devices() {
 
         if(/*descriptor->vendor_id == 0x00 ||*/ descriptor->vendor_id == 0xFFFF)
           break;
+
         __puts("PCI bus: ");
         __print_hex(bus & 0xFF);
         __puts(", vendor_id: ");
@@ -78,6 +100,8 @@ void print_all_devices() {
         __print_hex(descriptor->device_id & 0xFF);
         __puts(", devise: ");
         __print_hex(device & 0xFF);
+        __puts(", mastering: ");
+        __print_hex((descriptor->mastering & 0x00FF));
         __puts(", function: ");
         __print_hex(function & 0xFF);
         __puts(", interrupt: ");

@@ -36,7 +36,7 @@ int main() {
 
 	__puts("[Starting console]...\n");
 	
-	//print_all_devices();
+	print_all_devices();
 	//__int_11();
 	//findRTL();
 	//((EntryPoint)0x400000)(); // Start the console
