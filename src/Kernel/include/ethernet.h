@@ -8,5 +8,6 @@ void __clear_interrupt_rtl();
 uint16_t __rtl_vendor_id();
 uint16_t __rtl_device_id();
 void __rtl_handler();
+void __set_up_rtl_bus_mastering();
 
 #endif
