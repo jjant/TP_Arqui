@@ -56,11 +56,10 @@ void __private_line(char * str) {
 void __scroll() {
 	int i; 
 	
-	// Copy last lines in the beggining
-	for(i = width * 2 * 10; i < width * height * 2; i++) {
+	// Copy last lines to the beggining
+	for(i = width * 2 * 10; i < width * height * 2; i ++) {
 		video[i - width * 2 * 10] = video[i];
 	}
-	
 	// Clean last lines
 	for(i = width * 2 * (height - 10); i < width * height * 2; i += 2) {
 		video[i] = ' ';
@@ -94,10 +93,11 @@ void __putc(int c) {
 	if(c == '\n') {
 		if ((current_video - video) / (2 * 80) == height - 1) {
 			__scroll();
-			return 0;
+			return;
 		}
 
-		return __new_line();
+		__new_line();
+		return;
 	}
 
 	*current_video = c;

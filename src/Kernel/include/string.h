@@ -1,6 +1,7 @@
 #ifndef __STRING__H
 #define __STRING__H
 
+#include <stdint.h>
 #include <int.h>
 
 char * strcpy(char *, const char *);

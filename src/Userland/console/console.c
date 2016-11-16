@@ -37,9 +37,9 @@ int main() {
 }
 
 void console_loop() {
-	char command_history[HISTORY_SIZE][BUFFER_SIZE];
+/*	char command_history[HISTORY_SIZE][BUFFER_SIZE];
 	uint16_t command_history_index = 0;
-
+*/
 	char command[BUFFER_SIZE] = { 0 };
 	uint16_t current_index = 0;
 	int c;
@@ -64,31 +64,35 @@ void console_loop() {
 			else if (c == ESC) set_keyboard_language(0);
 			else if (c) putc(command[current_index++] = c);
 		}
+		command[current_index++] = 0;
 
-		parse_input(command, args);
-		private_line(args[0]);
-		execute_program(programs, args);	// args[0] is the name of the program to run.
+		if (parse_input(command, args)) {
+			private_line(args[0]);
+			execute_program(programs, args);	// args[0] is the name of the program to run.
+		} else {
+			putc('\n');
+		}
 
-		copy_buffer(command_history[command_history_index++ % HISTORY_SIZE], command, current_index);
-		clean_buffer(command, current_index);
+/*		copy_buffer(command_history[command_history_index++ % HISTORY_SIZE], command, current_index);
+*/		//clean_buffer(command, current_index);
 		current_index = 0;
 	}
 }
 
 void print_shell_icon() {
 	uint8_t color = set_color(console_color);
-	putc(' ');
-	puts("Rama's PC ");
+	puts(" Rama's PC ");
 	putc(26);
 	putc(' ');
 	set_color(color);
 }
 
 char ** parse_input(char * kb_buffer, char ** args) {
-
 	int k = 0;
 	char * current = args[0];
 	uint8_t in_string = 0;
+
+	if (strlen(kb_buffer) == 0) return 0;
 
 	while(*kb_buffer) {
 		if (k > 0 && *kb_buffer == '\'')
@@ -106,7 +110,6 @@ char ** parse_input(char * kb_buffer, char ** args) {
 	}
 
 	*current = '\0';
-	//args[k + 1][0] = '\0';
 	return args;
 }
 

@@ -47,6 +47,7 @@ char __push_key() {
 	char key = code_to_char(keycode);
   uint8_t isChar = key >= 'A' && key <= 'Z';
   uint8_t isNumeric = key >= '0' && key <= '9';
+
   
   // BEHAVIOR KEYS
   switch(key){
