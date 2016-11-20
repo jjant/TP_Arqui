@@ -68,7 +68,6 @@ PCI_Descriptor_t __get_descriptor(uint16_t bus, uint16_t device, uint16_t functi
   descriptor->device   = device;
   descriptor->function = function;
 
-  __pci_config_write(bus, device, function, 0x04, 0x7);
   descriptor->vendor_id    = __pci_config_read_word(bus, device, function, 0x00);
   descriptor->device_id    = __pci_config_read_word(bus, device, function, 0x02);
   descriptor->mastering    = __pci_config_read_word(bus, device, function, 0x04);
