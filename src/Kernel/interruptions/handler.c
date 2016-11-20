@@ -9,7 +9,7 @@ void __set_pic_slave_asm(uint8_t);
 
 typedef void (*handler_t)(void);
 
-handler_t handlers[5];
+handler_t handlers[30];
 
 void __tick_handler() {
 }

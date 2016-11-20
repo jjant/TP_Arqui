@@ -2,6 +2,7 @@
 #define __STRING__H
 
 #include <int.h>
+#include <stdint.h>
 
 char * strcpy(char *, const char *);
 char * strcat(char *, const char *);

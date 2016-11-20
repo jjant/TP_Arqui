@@ -5,6 +5,6 @@
 
 void __IDT_add_handler(int index, uint64_t handler);
 void __initialize_IDT();
-void __int_11();
+void __int_2B();
 
 #endif

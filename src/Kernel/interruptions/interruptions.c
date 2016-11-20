@@ -37,6 +37,6 @@ void __initialize_IDT() {
 }
 
 
-void __int_11() {
-	__int_11_asm();
+void __int_2B() {
+	__int_2B_asm();
 }
