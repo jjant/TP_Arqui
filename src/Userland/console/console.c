@@ -21,6 +21,7 @@ static struct program_s	programs[] = {
 	{"COLORSCHEME", shell_colorscheme},
 	{"TEXT", shell_text},
 	{"KEYBOARD", shell_language},
+	{"CHAT", shell_chat},
 	{"HELP", shell_help},
 	{"ECHO", shell_echo},
 	{"", shell_null},
@@ -146,8 +147,20 @@ uint16_t shell_quit(const char ** args) {
 }
 
 uint16_t shell_echo(const char ** args) {
-	puts(" Este es el program help.");
+	if (args[1]) puts(args[1]);
 	putc('\n');
+	return SHELL_OK;
+}
+
+uint16_t shell_chat(const char ** args) {
+	puts(" PROGRAMA DE CHAT:\n");
+	puts(" TALK <ID> para hablar con el usuario ID\n");
+	puts(" ESC para dejar de hablar con un usuario\n");
+	puts(" BROADCAST <MESSAGE> para broadcastear un mensaje\n");
+	puts(" HEAR para entrar en modo recepcion de mensajes\n");
+	puts(" EXIT para salir del chat\n");
+	putc('\n');
+	chat_program();
 	return SHELL_OK;
 }
 
@@ -171,7 +184,7 @@ uint16_t shell_help(const char ** args) {
 		puts(" HELP -- Ayuda al usuario \n\n");
 		
 		puts(" 1. SO es case sensitive. No seas brusco.\n");
-		puts(" 2. SO es case simple. No la compliques.\n");
+		puts(" 2. SO es simple. No la compliques.\n");
 		puts(" 3. SO es mas que aprobable. Hacele honor.\n\n");
 
 		puts(" COLOR <COLOR>: Cambia el color del texto\n");

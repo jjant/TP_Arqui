@@ -2,6 +2,7 @@
 #define CONSOLE_H
 
 #include <stdint.h>
+#include <chat.h>
 
 
 #define NULL (void *)0
@@ -23,6 +24,7 @@ char ** parse_input(char *, char **);
 uint16_t execute_program(struct program_s *, char **);
 uint16_t shell_invalid_input(const char **);
 uint16_t shell_quit(const char **);
+uint16_t shell_chat(const char **);
 uint16_t shell_help(const char **);
 uint16_t shell_clean(const char **);
 uint16_t shell_color(const char **);
