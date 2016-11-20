@@ -28,7 +28,7 @@ void __init_network() {
   __set_up_rtl_bus_mastering();
   __turn_on_rtl();
   __reset();
-  rx_buffer = __malloc(9000);
+  rx_buffer = __malloc(900);
   __set_up_buffer(rx_buffer);
   __promiscuous_rtl();
   __enable_receive_transmit();

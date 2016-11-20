@@ -8,6 +8,7 @@ struct PCI_Descriptor{
 
             uint8_t bus;
             uint8_t device;
+            uint8_t mastering;
             uint8_t function;
 
             uint16_t vendor_id;

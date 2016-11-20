@@ -68,8 +68,10 @@ PCI_Descriptor_t __get_descriptor(uint16_t bus, uint16_t device, uint16_t functi
   descriptor->device   = device;
   descriptor->function = function;
 
+  __pci_config_write(bus, device, function, 0x04, 0x7);
   descriptor->vendor_id    = __pci_config_read_word(bus, device, function, 0x00);
   descriptor->device_id    = __pci_config_read_word(bus, device, function, 0x02);
+  descriptor->mastering    = __pci_config_read_word(bus, device, function, 0x04);
   descriptor->class_id     = __pci_config_read_word(bus, device, function, 0x0B);
   descriptor->subclass_id  = __pci_config_read_word(bus, device, function, 0x0A);
   descriptor->interface_id = __pci_config_read_word(bus, device, function, 0x09);
@@ -100,6 +102,8 @@ void print_all_devices() {
         __print_hex(descriptor->device_id & 0xFF);
         __puts(", devise: ");
         __print_hex(device & 0xFF);
+        __puts(", mastering: ");
+        __print_hex((descriptor->mastering & 0x00FF));
         __puts(", function: ");
         __print_hex(function & 0xFF);
         __puts(", interrupt: ");
