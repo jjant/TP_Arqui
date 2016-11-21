@@ -1,36 +1,40 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-#include <stdint.h>
+#include <stdlib.h>
+#include <network.h>
 
+#define BUFFER_SIZE 128
+#define HISTORY_SIZE 20
+#define PROGRAM_COUNT 3
 
+#define MAX_ARG_LEN 50
+#define MAX_ARGS		10
+#define SHELL_QUIT  1
+#define SHELL_OK    0
 #define NULL (void *)0
-#define MAX_ARGS		50
+
+#define BACKSPACE 0x0E
+#define ESC 0x01
 
 typedef uint16_t (* shell_program)(const char **);
 
 struct program_s {
-	const char *name;
+  const char *name;
   shell_program fnc;
+	const char *help;
 };
 
-void console_loop();
-void print_shell_icon();
+struct color_s {
+  const char *name;
+  const uint8_t code;
+};
+
+// Syscall functions
 void cls();
 void private_line(char *);
 uint8_t set_color(uint8_t);
-char ** parse_input(char *, char **);
-uint16_t execute_program(struct program_s *, char **);
-uint16_t shell_invalid_input(const char **);
-uint16_t shell_quit(const char **);
+
 uint16_t shell_help(const char **);
-uint16_t shell_clean(const char **);
-uint16_t shell_color(const char **);
-uint16_t shell_language(const char **);
-uint16_t shell_text(const char **);
-uint16_t shell_colorscheme(const char **);
-uint16_t shell_null(const char **);
-uint16_t shell_echo(const char **);
-void clean_buffer(char *, uint16_t);
 
 #endif

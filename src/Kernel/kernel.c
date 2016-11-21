@@ -46,7 +46,7 @@ int main() {
 	
 	//print_all_devices();
 	__int_2B();
-	//((EntryPoint)0x400000)(); // Start the console
+	((EntryPoint)0x400000)(); // Start the console
 
 	return 0;
 }

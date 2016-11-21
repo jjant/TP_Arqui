@@ -56,8 +56,13 @@ void break_line() {
 }
 
 uint8_t is_char(char c) {
-  return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
+  return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == ' ';
 }
+
+uint8_t is_digit(char c) {
+  return c >= '0' && c <= '9';
+}
+
 
 void printf(char * str, ...) {
   int i = 0;
@@ -79,7 +84,7 @@ void printf(char * str, ...) {
 
       switch (next_char) {
       case 'd': putint(va_arg(args, int)); break;
-      case 'c': putc(va_arg(args, char)); break;
+      case 'c': putc(va_arg(args, int)); break;
       case 's':
         string_value = va_arg(args, char *);
         for (int j = 0; string_value[j] != '\0'; j++) {
