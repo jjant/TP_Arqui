@@ -79,10 +79,12 @@ int main() {
 	/*__int_2B();
 	__int_2B();
 	__int_2B();
+<<<<<<< 904fb74c3f529270458696e0faf58e569db0effd
 	__int_2B();*/
 	//__clear_screen();
 	//__puts("rtl desc:\n");
 	//((EntryPoint)0x400000)(); // Start the console
+	((EntryPoint)0x400000)(); // Start the console
 
 	return 0;
 }

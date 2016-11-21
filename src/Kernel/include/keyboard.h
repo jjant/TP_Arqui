@@ -3,7 +3,10 @@
 
 #include <video.h>
 #include <string.h>
+
 #define BUFFER_SIZE 128
+#define BACKSPACE 0x0E
+#define CAPS 0x3B
 
 int __key_pressed_asm();
 int __getchar();

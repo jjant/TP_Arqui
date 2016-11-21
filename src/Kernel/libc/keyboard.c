@@ -1,10 +1,5 @@
 #include <keyboard.h>
 
-
-#define BUFFER_SIZE 128
-#define BACKSPACE 0x0E
-#define CAPS 0x3B
-
 static char __code_to_char(int);
 
 static unsigned char keyboard_easteregg[] = {
