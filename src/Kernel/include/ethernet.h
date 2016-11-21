@@ -10,4 +10,19 @@ uint16_t __rtl_device_id();
 void __rtl_handler();
 void __set_up_rtl_bus_mastering();
 
+#define eth_addr_len  6
+#define eth_head_len  14
+#define eth_data_len  1400
+
+struct eth_header {
+  unsigned char dest[eth_head_len];
+  unsigned char src[eth_head_len];
+  unsigned short proto;
+};
+
+typedef struct {
+  struct eth_header header;
+  char  data[eth_data_len];
+} eth_frame;
+
 #endif

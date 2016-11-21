@@ -15,23 +15,45 @@
 #define rtl_device_id 0x8139
 #define rtl_interrupt 0x0B;
 
+#define tsad0 (ioaddr + 0x20)
+#define tsad1 (ioaddr + 0x24)
+#define tsad2 (ioaddr + 0x28)
+#define tsad3 (ioaddr + 0x2C)
+
+#define tsd0 (ioaddr + 0x10)
+#define tsd1 (ioaddr + 0x14)
+#define tsd2 (ioaddr + 0x18)
+#define tsd3 (ioaddr + 0x1C)
+
+#define mac_len 6
+#define buffer_len 8*1024+16
+
 static void __reset();
 static void __turn_on_rtl();
 static void __set_up_buffer();
 static void __set_up_imr();
 static void __promiscuous_rtl();
 static void __enable_receive_transmit();
+static void __set_up_tsad();
+static void __store_mac_in_frame();
 
-static void * rx_buffer;
+static uint8_t rx_buffer[buffer_len] = { 0 };
+static uint8_t 
+
+static struct {
+  eth_frame frame;
+  uint32_t  size;
+} transmission;
 
 void __init_network() {
   __set_up_rtl_bus_mastering();
   __turn_on_rtl();
   __reset();
-  rx_buffer = __malloc(900);
   __set_up_buffer(rx_buffer);
   __promiscuous_rtl();
   __enable_receive_transmit();
+  __set_up_tsad();
+  __store_mac_in_frame();
 }
 
 static void __turn_on_rtl() {
@@ -40,28 +62,42 @@ static void __turn_on_rtl() {
 
 static void __reset() {
 	__outportb(ioaddr + cmd_reg, 0x10);
-	//while( (__inportb(cmd_reg) & 0x10) != 0);
+	while( (__inportb(cmd_reg) & 0x10) != 0);
 }
 
 static void __set_up_buffer(void * buffer) {
-  //change later
-  __outportdw(ioaddr + rbstart_reg, buffer);
+  __outportdw(ioaddr + rbstart_reg, (uint32_t)buffer);
 }
 
 // Only allows Transmit OK and Receive OK interrups.
 static void __set_up_imr() {
-  __outportw(ioaddr + imr_reg, 0x0005);
+  __outportw(ioaddr + imr_reg, 0x000F);
 }
 
 
 // check ths later
 static void __promiscuous_rtl() {
-  __outportdw(ioaddr + 0x44, 0xf | (1 << 7)); // (1 << 7) is the WRAP bit, 0xf is AB+AM+APM+AAP
+  __outportdw(ioaddr + 0x44, 0xF | (1 << 7)); // (1 << 7) is the WRAP bit, 0xf is AB+AM+APM+AAP
 }
 
 // Sets the Receiver enabled (RE) and Transmitter enabled (TE) bits on.
 static void __enable_receive_transmit() {
   __outportb(ioaddr + cmd_reg, 0x0C);
+}
+
+static void __set_up_tsad() {
+  __outportdw(tsad0, (uint32_t)&transmission.frame);
+  __outportdw(tsad1, (uint32_t)&transmission.frame);
+  __outportdw(tsad2, (uint32_t)&transmission.frame);
+  __outportdw(tsad3, (uint32_t)&transmission.frame);
+}
+
+static void __store_mac_in_frame() {
+  int i;
+  for(i = 0; i < mac_len; i++) {
+    transmission.frame.header.src[i] = __inportb(ioaddr + i);
+    mac_addr[i] = __inportb(ioaddr+i);
+  }
 }
 
 // Should be called after handling an rtl interrupt.
