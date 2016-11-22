@@ -46,6 +46,7 @@ static uint16_t shell_send(const char ** args) {
 		char * user = args[1];
 		char * message = args[2];
 		send_message(strcmp(user, "ALL") == 0 ? -1 : atoi(user), message);
+		printf(" Mensaje enviado con exito.\n");
 		putc('\n');
 	}
 	return SHELL_OK;
@@ -145,7 +146,7 @@ static uint16_t shell_placeholder(const char ** args) {
 static struct program_s	programs[] = {
 	{"QUIT", 				shell_quit, "No recibe parametros."},
 	{"CLS", 				shell_clean, "No recibe parametros."},
-	{"COLOR", 			shell_color, "Los colores disponibles son: AMARILLO, LIMA, TURQUESA, GRIS, BLANCO, NARANJA, FUCSIA, NARANJA, CELESTE, VERDE, AZUL, PIEDRA, ROSA, ARCILLA y NEGRO."},
+	{"COLOR", 			shell_color, "Los colores disponibles son: AMARILLO, LIMA, TURQUESA, GRIS, BLANCO, FUCSIA, NARANJA, CELESTE, VERDE, AZUL, PIEDRA, ROSA, ARCILLA y NEGRO."},
 	{"COLORSCHEME", shell_colorscheme, "Los esquemas disponibles son: RIBER, BOCA y PATRIA."},
 	{"TEXT", 				shell_text, "Presiona ESC para salir del editor"},
 	{"SEND", 				shell_send, "IDs disponibles de acuerdo a las instancias del SO abiertas."},
@@ -224,8 +225,12 @@ static char ** parse_input(char * kb_buffer, char ** args) {
 	uint8_t in_string = 0;
 
 	while(*kb_buffer) {
-		if (k > 0 && *kb_buffer == '\'')
+		if (k > 0 && *kb_buffer == '\'') {
 			in_string = in_string ? 0 : 1;
+			kb_buffer++;
+			continue;
+		}
+
 		if(*kb_buffer != ' ' || in_string && *kb_buffer == ' ') {
 			*current = *kb_buffer;
 			current++;
