@@ -66,7 +66,7 @@ static void __turn_on_rtl() {
 
 static void __reset() {
 	__outportb(ioaddr + cmd_reg, 0x10);
-	//while( (__inportb(cmd_reg) & 0x10) != 0);
+	while( (__inportb(ioaddr + cmd_reg) & 0x10) != 0);
 }
 
 static void __set_up_buffer(void * buffer) {
@@ -233,9 +233,8 @@ uint8_t * __get_own_mac(uint8_t mac_buffer[mac_len]) {
 // Debug
 
 void __print_rtl_status() {
-  __clear_screen();
   uint16_t isr = __inportw(ioaddr + isr_reg);
   __puts("TRANSMIT_OK: ");
   __print_hex(isr & transmit_ok);
-
+  __puts("\n");
 }

@@ -46,6 +46,7 @@ int main() {
 
 	__puts("[Starting console]...\n");
 	
+	__print_rtl_status();
 	//print_all_devices();
 	__puts("Sending message to rtl...");
 	rtl_send("la concha de tu madre", 0x0);

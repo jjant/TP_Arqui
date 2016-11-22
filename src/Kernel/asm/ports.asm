@@ -7,37 +7,38 @@ GLOBAL __inportw_asm
 GLOBAL __inportdw_asm
 
 __outportb_asm:
-  push  rbp
-  mov   rbp, rsp
+  push rbx
+  push rax 
 
-  push  rdx
-  push  rax
+  mov rbx, rdi
+  and rbx, 0xFFFF ;16 bits
 
-  mov   al, dil
-  mov   dx, si
+  mov rax, rsi
 
-  out   dx, al
+  mov dx, bx
+  out dx, al
+  
 
-  pop   rax
-  pop   rdx
-  leave
+  pop rax
+  pop rbx
   ret
-
 
 ; __outportw(uint16_t port, uint16_t data)
 __outportw_asm:
-  push  rbp
-  mov   rbp, rsp
-  push  rax
-  push  rdx
+  push rbx
+  push rax 
 
-  mov   rdx, rdi    
-  mov   rax, rsi
-  out   dx, ax
+  mov rbx, rdi
+  and rbx, 0xFFFF ;16 bits
 
-  pop   rdx
-  pop   rax
-  leave
+  mov rax, rsi
+
+  mov dx, bx
+  out dx, ax
+  
+
+  pop rax
+  pop rbx
   ret
 
 
@@ -46,18 +47,20 @@ __outportw_asm:
 ; data: RSI
 
 __outportdw_asm:
-  push  rbp
-  mov   rbp, rsp
-  push  rdx
-  push  rax
+  push rbx
+  push rax 
 
-  mov   rdx, rdi
-  mov   rax, rsi
-  out   dx, eax
+  mov rbx, rdi
+  and rbx, 0xFFFF ;16 bits
 
-  pop   rax
-  pop   rdx
-  leave
+  mov rax, rsi
+
+  mov dx, bx
+  out dx, eax
+  
+
+  pop rax
+  pop rbx
   ret
 
 
@@ -84,41 +87,52 @@ __outport64_asm:
 ;uint8_t __inportb_asm(uint16_t port);
 ; port: RDI
 __inportb_asm:
-  push  rbp
-  mov   rbp, rsp
-  push  rdx
+  push rbx
 
-  mov   dx, di
-  in    al, dx
+  mov rbx, rdi
+  and rbx, 0xFFFF ;16 bits
 
-  pop   rdx
-  leave
+  mov rax, rsi
+
+  mov dx, bx
+  in al, dx
+  and rax, 0xff;
+  
+  pop rbx
+
   ret
 
 ;uint16_t __inportw_asm(uint16_t port);
 ; port: RDI
 __inportw_asm:
-  push  rbp
-  mov   rbp, rsp
-  push  rbx
+  push rbx
 
-  mov   dx, di
-  in    ax, dx
+  mov rbx, rdi
+  and rbx, 0xFFFF ;16 bits
 
-  pop   rbx
-  leave
+  mov rax, rsi
+
+  mov dx, bx
+  in ax, dx
+  and rax, 0xffff;
+  
+  pop rbx
+
   ret
 
 ;uint32_t __inportdw_asm(uint16_t port);
 ; port: RDI
 __inportdw_asm:
-  push  rbp
-  mov   rbp, rsp
-  push  rbx
+  push rbx
 
-  mov   dx, di
-  in    eax, dx
+  mov rbx, rdi
+  and rbx, 0xFFFF ;16 bits
 
-  pop   rbx
-  leave
+  mov rax, rsi
+
+  mov dx, bx
+  in eax, dx
+
+  pop rbx
+
   ret
