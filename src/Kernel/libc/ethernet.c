@@ -28,6 +28,7 @@
 
 #define tsd_own (1 << 13)
 #define transmit_ok (1 << 2)
+#define receive_ok  1
 
 #define buffer_len 8*1024+16
 
@@ -87,6 +88,7 @@ static void __promiscuous_rtl() {
 // Sets the Receiver enabled (RE) and Transmitter enabled (TE) bits on.
 static void __enable_receive_transmit() {
   __outportb(ioaddr + cmd_reg, 0x0C);
+  
 }
 
 static void __set_up_tsad() {
@@ -102,6 +104,8 @@ static void __store_mac_in_frame() {
     transmission.frame.header.src[i] = __inportb(ioaddr + i);
     mac_addr[i] = __inportb(ioaddr+i);
   }
+  __puts("mac aca!!!:");
+  __print_mac_address(transmission.frame.header.src);
 }
 
 // Should be called after handling an rtl interrupt.
@@ -115,8 +119,8 @@ void __rtl_handler() {
   
 
   // rtl sucks and needs to be reset.
+  __clear_interrupt_rtl();
   __init_network();
-  //__clear_interrupt_rtl();
 }
 
 
@@ -146,6 +150,8 @@ void rtl_send(char * msg, int dst){
     transmission.frame.header.dest[4] = '\x55';
     transmission.frame.header.dest[5] = dst;
   }
+
+  __print_mac_address(transmission.frame.header.dest);
 
   uint32_t tsd = tsd0 + (cur_descriptor * 4);
   uint32_t tsad = tsad0 + (cur_descriptor * 4);
@@ -180,6 +186,7 @@ uint16_t __rtl_device_id() {
 
 void __set_up_rtl_bus_mastering() {
   PCI_Descriptor_t rtl_descriptor = __get_rtl_descriptor();
+  __print_pci_descriptor(rtl_descriptor);
   //WTF WHY DOES THE FIRST DIGIT NOT WORK??? THIS RETURNS 0x07 ON THE REGISTER.
   __pci_write(rtl_descriptor->bus, rtl_descriptor->device, rtl_descriptor->function, 0x04, 0x7);
 
@@ -228,13 +235,75 @@ uint8_t * __get_own_mac(uint8_t mac_buffer[mac_len]) {
   for(i = 0; i < mac_len; i++) {
     mac_buffer[i] = mac_addr[i];
   }
+
+  return mac_buffer;
 }
 
+void __print_mac_address(uint8_t mac_addr[mac_len]) {
+  for (int i = 0; i < 6; ++i) {
+    __print_hex(mac_addr[i]);
+    __puts(":");
+  }
+}
+
+void __print_own_mac() {
+  uint8_t buf[6];
+  __print_mac_address(__get_own_mac(buf));
+}
 // Debug
 
 void __print_rtl_status() {
   uint16_t isr = __inportw(ioaddr + isr_reg);
   __puts("TRANSMIT_OK: ");
   __print_hex(isr & transmit_ok);
+  __puts("\nRECEIVE OK: ");
+  __print_hex(isr & receive_ok);
   __puts("\n");
+  __puts("RECEIVE_TRANSMIT: ");
+  __print_hex(__inportb(ioaddr + cmd_reg));
+}
+
+void _debug_rtl_handler(){
+  uint16_t isr = __inportw(ioaddr + isr_reg);
+
+  __outportw(isr, 0x0);
+  __new_line();
+  __puts("Interrupting with ISR: ");
+  __print_hex(isr);
+  __new_line();
+
+  int i;
+  if(isr & transmit_ok){ //Transmit OK
+  
+    __puts("Transmitted ");
+    ncPrintDec(transmission.size);
+    __puts(" bytes.");
+    __new_line();
+
+    __puts("Sent: ");
+    uint8_t * buf = ((uint8_t*)(&transmission.frame));
+    for(i = 0; i < 30 ; i++){
+      __puts(buf[i]);
+      __puts(" ");
+    }
+
+    __new_line();
+
+  }
+
+  if(isr & receive_ok){
+    __puts("Just recieved a package. It starts like this:");
+
+    uint8_t * buf = ((uint8_t*)rx_buffer);
+    for(i = 0; i < 30 ; i++){
+      __print_hex(buf[i]);
+      __puts(" ");
+    }
+
+    __new_line();
+
+    //rtl_save_msg(1, receiveBuffer + RX_DATA_OFFSET);
+  }
+
+  __init_network();
 }

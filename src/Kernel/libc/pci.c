@@ -83,34 +83,37 @@ PCI_Descriptor_t __get_descriptor(uint16_t bus, uint16_t device, uint16_t functi
 void print_all_devices() {
   uint16_t bus, device, function;
   __clear_screen();
-  for(bus = 0; bus < 256; bus++) {
+  for(bus = 0; bus < 8; bus++) {
     for(device = 0; device < 32; device++) {
       for(function = 0 ; function < 8; function++) {
         PCI_Descriptor_t descriptor = __get_descriptor(bus, device, function);
 
         if(descriptor->vendor_id == 0x00 || descriptor->vendor_id == 0xFFFF)
           continue;
-
-        __puts("PCI bus: ");
-        __print_hex(bus & 0xFF);
-        __puts(", vendor_id: ");
-        __print_hex((descriptor->vendor_id & 0xFF00) >> 8);
-        __print_hex(descriptor->vendor_id & 0xFF);
-        __puts(", device_id: ");
-        __print_hex((descriptor->device_id & 0xFF00) >> 8);
-        __print_hex(descriptor->device_id & 0xFF);
-        __puts(", devise: ");
-        __print_hex(device & 0xFF);
-        __puts(", mastering: ");
-        __print_hex((descriptor->mastering & 0x00FF));
-        __puts(", function: ");
-        __print_hex(function & 0xFF);
-        __puts(", interrupt: ");
-        __print_hex(descriptor->interrupt & 0x0F);
-        __new_line();
+        __print_pci_descriptor(descriptor);
       }
     }
   }
+}
+
+void __print_pci_descriptor(PCI_Descriptor_t descriptor) {
+  __puts("PCI bus: ");
+  __print_hex(descriptor->bus & 0xFF);
+  __puts(", vendor_id: ");
+  __print_hex((descriptor->vendor_id & 0xFF00) >> 8);
+  __print_hex(descriptor->vendor_id & 0xFF);
+  __puts(", device_id: ");
+  __print_hex((descriptor->device_id & 0xFF00) >> 8);
+  __print_hex(descriptor->device_id & 0xFF);
+  __puts(", devise: ");
+  __print_hex(descriptor->device & 0xFF);
+  __puts(", function: ");
+  __print_hex(descriptor->function & 0xFF);
+  __puts(", interrupt: ");
+  __print_hex(descriptor->interrupt & 0x0F);
+  __puts(", mastering: ");
+  __print_hex((descriptor->mastering & 0x00FF));  
+  __new_line();
 }
 
 uint16_t __cmd_reg_value(PCI_Descriptor_t descriptor) {
