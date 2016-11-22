@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define mac_len 6
+
 void __init_network();
 void __clear_interrupt_rtl();
 uint16_t __rtl_vendor_id();
@@ -10,6 +12,7 @@ uint16_t __rtl_device_id();
 void __rtl_handler();
 void __set_up_rtl_bus_mastering();
 void rtl_send(char *, int);
+uint8_t * __get_own_mac(uint8_t mac_buffer[mac_len]);
 
 #define eth_addr_len  6
 #define eth_head_len  14

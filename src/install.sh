@@ -17,5 +17,5 @@ sudo ip link set dev br2 up
 sudo ip link set dev tap0 up
 sudo ip link set dev tap1 up
 sudo ip link set dev tap2 up
-echo 1 > /proc/sys/net/ipv6/conf/br2/autoconf
+sudo echo 1 > /proc/sys/net/ipv6/conf/br2/autoconf
 

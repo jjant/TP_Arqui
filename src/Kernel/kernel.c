@@ -14,6 +14,8 @@ typedef int (*EntryPoint)();
 
 int main() {
 	uint16_t cmd_status;
+	uint8_t mac_addr[6];
+	char buffer[10];
 
 	__new_line();
 	__puts("[Initializing IDT]...");
@@ -45,7 +47,16 @@ int main() {
 	__puts("[Starting console]...\n");
 	
 	//print_all_devices();
-	__int_2B();
+	__puts("Sending message to rtl...");
+	rtl_send("la concha de tu madre", 0x0);
+	__puts("   Done.\n");
+
+	__puts("mac addr:");
+	__get_own_mac(mac_addr);
+	for (int i = 0; i < 6; ++i) {
+		__print_hex(mac_addr[i]);
+	}
+	__print_rtl_status();
 	//((EntryPoint)0x400000)(); // Start the console
 
 	return 0;

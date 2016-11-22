@@ -26,7 +26,9 @@
 #define tsd2 (ioaddr + 0x18)
 #define tsd3 (ioaddr + 0x1C)
 
-#define mac_len 6
+#define tsd_own (1 << 13)
+#define transmit_ok (1 << 2)
+
 #define buffer_len 8*1024+16
 
 static void __reset();
@@ -40,6 +42,7 @@ static void __store_mac_in_frame();
 
 static uint8_t rx_buffer[buffer_len] = { 0 };
 static uint8_t mac_addr[mac_len];
+static uint8_t cur_descriptor;
 
 static struct {
   eth_frame frame;
@@ -63,7 +66,7 @@ static void __turn_on_rtl() {
 
 static void __reset() {
 	__outportb(ioaddr + cmd_reg, 0x10);
-	while( (__inportb(cmd_reg) & 0x10) != 0);
+	//while( (__inportb(cmd_reg) & 0x10) != 0);
 }
 
 static void __set_up_buffer(void * buffer) {
@@ -133,32 +136,32 @@ void rtl_send(char * msg, int dst){
 
   if(dst < 0){ 
     for(i = 0; i < mac_len ; i++)
-      transmission.frame.hdr.dst[i] = '\xff';
+      transmission.frame.header.dest[i] = '\xff';
   } else {
     //Mensaje privado
-    transmission.frame.hdr.dst[0] = '\xDE';
-    transmission.frame.hdr.dst[1] = '\xAD';
-    transmission.frame.hdr.dst[2] = '\xC0';
-    transmission.frame.hdr.dst[3] = '\xFF';
-    transmission.frame.hdr.dst[4] = '\xEE';
-    transmission.frame.hdr.dst[5] = dst;
+    transmission.frame.header.dest[0] = '\xBA';
+    transmission.frame.header.dest[1] = '\xDA';
+    transmission.frame.header.dest[2] = '\x55';
+    transmission.frame.header.dest[3] = '\xEE';
+    transmission.frame.header.dest[4] = '\x55';
+    transmission.frame.header.dest[5] = dst;
   }
 
-  uint32_t tsd = TSD0 + (currentDescriptor * 4);
-  uint32_t tsad = TSAD0 + (currentDescriptor * 4);
+  uint32_t tsd = tsd0 + (cur_descriptor * 4);
+  uint32_t tsad = tsad0 + (cur_descriptor * 4);
 
 
-  transmission.frame.header.proto = ETH_P_802_3; //Dummy type
+  transmission.frame.header.proto = eth_p_802_3; //Dummy type
 
   memcpy(transmission.frame.data, msg, strlen(msg));
 
 
-  uint32_t descriptor = ETH_HLEN + strlen(msg); //Bits 0-12: Size
+  uint32_t descriptor = eth_head_len + strlen(msg); //Bits 0-12: Size
   transmission.size = descriptor; 
-  descriptor &= ~(TSD_OWN); //Apago el bit 13 TSD_OWN
+  descriptor &= ~(tsd_own); //Apago el bit 13 TSD_OWN
   descriptor &= ~(0x3f << 16);  // 21-16 threshold en 0
   
-  while (!(__inportdw(tsd) & TSD_OWN));
+  while (!(__inportdw(tsd) & tsd_own));
 
   __outportdw(tsd, descriptor);
 }
@@ -217,4 +220,22 @@ If set to 1 the device can respond to Memory Space accesses; otherwise, the devi
 I/O Space:
 If set to 1 the device can respond to I/O Space accesses; otherwise, the device's response is disabled.
 */
+}
+
+
+uint8_t * __get_own_mac(uint8_t mac_buffer[mac_len]) {
+  int i;
+  for(i = 0; i < mac_len; i++) {
+    mac_buffer[i] = mac_addr[i];
+  }
+}
+
+// Debug
+
+void __print_rtl_status() {
+  __clear_screen();
+  uint16_t isr = __inportw(ioaddr + isr_reg);
+  __puts("TRANSMIT_OK: ");
+  __print_hex(isr & transmit_ok);
+
 }
