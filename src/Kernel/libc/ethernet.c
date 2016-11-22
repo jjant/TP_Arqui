@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <memory.h>
 #include <pci.h>
+#include <lib.h>
 
 #define ioaddr        0xC000
 #define cmd_reg       0x37
@@ -38,7 +39,7 @@ static void __set_up_tsad();
 static void __store_mac_in_frame();
 
 static uint8_t rx_buffer[buffer_len] = { 0 };
-static uint8_t 
+static uint8_t mac_addr[mac_len];
 
 static struct {
   eth_frame frame;
@@ -109,8 +110,62 @@ void __rtl_handler() {
   /* Do stuff */
   __puts("Me llego algo\n");
   
-  __clear_interrupt_rtl();
+
+  // rtl sucks and needs to be reset.
+  __init_network();
+  //__clear_interrupt_rtl();
 }
+
+
+// de aca para abajo es robado de marcelo
+/*
+  Envia un mensaje (null terminated) a la MAC que se envia como parametro
+  Se leen los primeros 6 bytes a partir de la mac destino. 
+  Se usa el frame de Ethernet II (https://en.wikipedia.org/wiki/Ethernet_frame#Ethernet_II)
+  Que tiene la estructura de ethframe en <ethernet.h>: 6 bytes de MAC destino, 6 bytes de
+  MAC origen, 2 bytes de protipo (se pone el dummy type), y el resto de los bytes con el cuerpo
+  del mensaje. 
+  Mas info del mecanismo en la programmers guide (http://www.cs.usfca.edu/~cruse/cs326f04/RTL8139_ProgrammersGuide.pdf)
+  y la data sheet para los registros (http://www.cs.usfca.edu/~cruse/cs326f04/RTL8139D_DataSheet.pdf)
+*/
+void rtl_send(char * msg, int dst){
+  int i;
+
+  if(dst < 0){ 
+    for(i = 0; i < mac_len ; i++)
+      transmission.frame.hdr.dst[i] = '\xff';
+  } else {
+    //Mensaje privado
+    transmission.frame.hdr.dst[0] = '\xDE';
+    transmission.frame.hdr.dst[1] = '\xAD';
+    transmission.frame.hdr.dst[2] = '\xC0';
+    transmission.frame.hdr.dst[3] = '\xFF';
+    transmission.frame.hdr.dst[4] = '\xEE';
+    transmission.frame.hdr.dst[5] = dst;
+  }
+
+  uint32_t tsd = TSD0 + (currentDescriptor * 4);
+  uint32_t tsad = TSAD0 + (currentDescriptor * 4);
+
+
+  transmission.frame.header.proto = ETH_P_802_3; //Dummy type
+
+  memcpy(transmission.frame.data, msg, strlen(msg));
+
+
+  uint32_t descriptor = ETH_HLEN + strlen(msg); //Bits 0-12: Size
+  transmission.size = descriptor; 
+  descriptor &= ~(TSD_OWN); //Apago el bit 13 TSD_OWN
+  descriptor &= ~(0x3f << 16);  // 21-16 threshold en 0
+  
+  while (!(__inportdw(tsd) & TSD_OWN));
+
+  __outportdw(tsd, descriptor);
+}
+
+
+// ends stolen
+
 
 uint16_t __rtl_vendor_id() {
   return rtl_vendor_id;
