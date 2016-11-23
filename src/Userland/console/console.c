@@ -57,8 +57,6 @@ static uint16_t shell_hear(const char ** args) {
 		char * message = read_message();
 		if (message) printf("%s\n", message);
 	}
-
-	putc('\n');
 	return SHELL_OK;
 }
 

@@ -73,7 +73,7 @@ void printf(char * str, ...) {
 
   while (str[i] != '\0') {
     char next_char = str[i + 1];
-    if (is_char(str[i])) putc(str[i]);
+    if (is_char(str[i]) || is_digit(str[i])) putc(str[i]);
     else if (str[i] == '\\') putc(next_char == 'n' ? '\n' : '\\'); 
     else if (str[i] == '%') {
       if (next_char != 'c' && next_char != 'd' && next_char != 's') {
