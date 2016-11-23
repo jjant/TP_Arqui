@@ -32,7 +32,7 @@ int main() {
 	__set_pic_slave(0x0);	//enable everything
 	__puts("   Done.\n");
 	__puts("[Initializing ethernet device]...");
-	__init_network();
+	//__init_network();
 	__puts("   Done.\n");
 	/*
 	__puts("Register status on rtl: 0x");
@@ -49,10 +49,10 @@ int main() {
 
 	//__puts("[Starting console]...\n");
 	__puts("My mac address: ");
-	__print_own_mac();
+	//__print_own_mac();
 	__puts("\n");
 
-	__print_rtl_status();
+	//__print_rtl_status();
 	//print_all_devices();
 	//_debug_rtl_handler();
 	__puts("Sending message to rtl...");
@@ -65,7 +65,7 @@ int main() {
 	__get_own_mac(mac_addr);
 
 */
-	__get_own_mac(mac_addr);
+	/*__get_own_mac(mac_addr);
 	for (int i = 0; i < 6; ++i) {
 		__print_hex(mac_addr[i]);
 	}

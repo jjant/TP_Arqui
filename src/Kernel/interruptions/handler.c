@@ -21,7 +21,7 @@ void __key_handler() {
 void __initialize_handlers() {
   handlers[0]  = __tick_handler;
 	handlers[1]  = __key_handler;
-  handlers[11] = __rtl_handler;
+  handlers[11] = rtlHandler;
 }
 
 void __irq_dispatcher(int irq) {

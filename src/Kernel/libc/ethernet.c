@@ -5,305 +5,623 @@
 #include <pci.h>
 #include <lib.h>
 
-#define ioaddr        0xC000
-#define cmd_reg       0x37
-#define rbstart_reg   0x30
-#define config_1_reg  0x52
-#define imr_reg       0x3C
-#define isr_reg       0x3E
 
-#define rtl_vendor_id 0x10EC
-#define rtl_device_id 0x8139
-#define rtl_interrupt 0x0B;
+void * _memalloc(uint64_t size);
 
-#define tsad0 (ioaddr + 0x20)
-#define tsad1 (ioaddr + 0x24)
-#define tsad2 (ioaddr + 0x28)
-#define tsad3 (ioaddr + 0x2C)
+#define IOADDR 0xC000
 
-#define tsd0 (ioaddr + 0x10)
-#define tsd1 (ioaddr + 0x14)
-#define tsd2 (ioaddr + 0x18)
-#define tsd3 (ioaddr + 0x1C)
+#define TSAD0 (IOADDR + 0x20)
+#define TSAD1 (IOADDR + 0x24)
+#define TSAD2 (IOADDR + 0x28)
+#define TSAD3 (IOADDR + 0x2C)
 
-#define tsd_own (1 << 13)
-#define transmit_ok (1 << 2)
-#define receive_ok  1
+#define TSD0 (IOADDR + 0x10)
+#define TSD1 (IOADDR + 0x14)
+#define TSD2 (IOADDR + 0x18)
+#define TSD3 (IOADDR + 0x1C)
 
-#define buffer_len 8*1024+16
+#define ISR (IOADDR + 0x3E) 
 
-static void __reset();
-static void __turn_on_rtl();
-static void __set_up_buffer();
-static void __set_up_imr();
-static void __promiscuous_rtl();
-static void __enable_receive_transmit();
-static void __set_up_tsad();
-static void __store_mac_in_frame();
 
-static uint8_t rx_buffer[buffer_len] = { 0 };
-static uint8_t mac_addr[mac_len];
-static uint8_t cur_descriptor;
+#define TX_SW_BUFFER_NUM 4
+#define TSD_TOK (1 << 15)
+#define TSD_OWN (1 << 13)
 
+
+//Bitflags del ISR
+#define TRANSMIT_OK   (1 << 2)
+#define RECEIVE_OK    1
+#define ISR_ERROR   (1<<1 | 1<<3)
+
+
+#define BUF_SIZE 8*1024+16
+#define MAC_SIZE 6
+#define PROTO_SIZE 6
+#define MSG_BUF_SIZE 100
+#define MAX_MSG_SIZE 512
+#define DATE_SIZE 16
+
+#define MAX_USERS 0xff
+
+#define RX_HEADER_SIZE 4
+#define RX_DATA_OFFSET (RX_HEADER_SIZE + ETH_HLEN) //Aca arranca la data posta en el frame ethernet 
+                      //(antes 4 bytes de header + 2 macs + 2 de proto)
+#define USER_BYTE_OFFSET (RX_HEADER_SIZE + MAC_SIZE + MAC_SIZE - 1) //Ultimo byte de la MAC de origen
+
+
+#define TRUE 1
+#define FALSE 0
+
+
+static int checkMAC(uint8_t* dir);
+static int is_broadcast(uint8_t * frame);
+
+/*
+  Este es el frame que se usa para enviar 
+*/
 static struct {
-  eth_frame frame;
-  uint32_t  size;
+  ethframe frame;
+  uint32_t size;
 } transmission;
 
-void __init_network() {
-  __set_up_rtl_bus_mastering();
-  __turn_on_rtl();
-  __reset();
-  __set_up_buffer(rx_buffer);
-  __promiscuous_rtl();
-  __enable_receive_transmit();
-  __set_up_tsad();
-  __store_mac_in_frame();
-}
 
-static void __turn_on_rtl() {
-  __outportb(ioaddr + config_1_reg, 0x0);
-}
-
-static void __reset() {
-	__outportb(ioaddr + cmd_reg, 0x10);
-	while( (__inportb(ioaddr + cmd_reg) & 0x10) != 0);
-}
-
-static void __set_up_buffer(void * buffer) {
-  __outportdw(ioaddr + rbstart_reg, (uint32_t)buffer);
-}
-
-// Only allows Transmit OK and Receive OK interrups.
-static void __set_up_imr() {
-  __outportw(ioaddr + imr_reg, 0x000F);
-}
+//Aca voy a guardar mi direccion MAC
+static uint8_t myMAC[6];
 
 
-// check ths later
-static void __promiscuous_rtl() {
-  __outportdw(ioaddr + 0x44, 0xF | (1 << 7)); // (1 << 7) is the WRAP bit, 0xf is AB+AM+APM+AAP
-}
+static int connected_users[MAX_USERS] = {0};
+static int am_i_connected = 0;
 
-// Sets the Receiver enabled (RE) and Transmitter enabled (TE) bits on.
-static void __enable_receive_transmit() {
-  __outportb(ioaddr + cmd_reg, 0x0C);
+
+static uint8_t receiveBuffer[BUF_SIZE] = {0};
+
+/*
+  Cada slot del buffer circular que guarda los mensajes recibidos
+  tiene esta forma.
   
-}
+  El campo present indica si el slot esta ocupado 
+  (si se guardo un mensaje y nunca se leyo) 
 
-static void __set_up_tsad() {
-  __outportdw(tsad0, (uint32_t)&transmission.frame);
-  __outportdw(tsad1, (uint32_t)&transmission.frame);
-  __outportdw(tsad2, (uint32_t)&transmission.frame);
-  __outportdw(tsad3, (uint32_t)&transmission.frame);
-}
+  El campo broadcast indica si fue un mensaje broadcast
+  y user el numero de usuario (ultimo byte de la MAC de origen)
+*/
+typedef struct{
+  char present;
+  struct{
+    char broadcast;
+    char user;
+    char data[MAX_MSG_SIZE + 1];
+  } msg;
+  struct{
+    char day;
+    char month;
+    char year;
+    char hour;
+    char min;
+  } time;
+} msg_slot;
 
-static void __store_mac_in_frame() {
+
+/*
+  message_buffer guarda los mensajes y se implementa como
+  un buffer circular: current apunta al proximo indice a escribir
+  y pointer al proximo indice a leer. Si 
+*/
+static msg_slot message_buffer[MSG_BUF_SIZE];
+static int pointer = 0;
+static int current = 0;
+
+
+static uint8_t currentDescriptor;
+
+
+static void rtl_save_msg(int is_broadcast, char * msg);
+static int is_disconnect(uint8_t * frame);
+static int is_connect(uint8_t * frame);
+
+
+void rtl_init(){
+
+  // ===Turning on the RTL8139 ===
+  //  Send 0x00 to the CONFIG_1 register (0x52) to set the LWAKE + LWPTN to active high.
+  //  This should essentially power on the device. */
+
+  __outportb( IOADDR + 0x52, 0x0); //Power on
+
+
+// ==== Software Reset! =======
+  // Next, we should do a software reset to clear the RX and TX buffers and set everything back to defaults.
+  // Do this to eliminate the possibility of there still being garbage left in the buffers or registers on power on.
+  // Sending 0x10 to the Command register (0x37) will send the RTL8139 into a software reset.
+  // Once that byte is sent, the RST bit must be checked to make sure that the chip has finished the reset.
+  // If the RST bit is high (1), then the reset is still in operation.
+
+  // NB: There is a minor bug in Qemu. If you check the command register before performing a soft reset,
+  // you may find the RST bit is high (1). Just ignore it and carry on with the initialization procedure.
+  __outportb( IOADDR + 0x37, 0x10);
+
+  while( (__inportb(IOADDR + 0x37) & 0x10) != 0) { /* nada */ }
+
+
+  //Init Receive buffer
+
+    //For this part, we will send the chip a memory location to use as its receive buffer start location.
+    //One way to do it, would be to define a buffer variable and send that variables memory location
+
+  //ioaddr is obtained from PCI configuration
+  //__outportdw(IOADDR + 0x30, (uintptr_t)rx_buffer);  send uint32_t memory location to RBSTART (0x30)
+  //to the RBSTART register (0x30).
+  __outportdw(IOADDR + 0x30, (uint32_t)receiveBuffer);
+
+
+ //===Set IMR + ISR=======
+    // The Interrupt Mask Register (IMR) and Interrupt Service Register (ISR) are responsible
+    // for firing up different IRQs. The IMR bits line up with the ISR bits to work in sync.
+    // If an IMR bit is low, then the corresponding ISR bit with never fire an IRQ when the time comes for it to happen.
+    // The IMR is located at 0x3C and the ISR is located at 0x3E.
+
+    // To set the RTL8139 to accept only the Transmit OK (TOK) and Receive OK (ROK) interrupts,
+    // we would have the TOK and ROK bits of the IMR high and leave the rest low.
+    // That way when a TOK or ROK IRQ happens, it actually will go through and fire up an IRQ.
+  __outportw(IOADDR + 0x3C, 0x000f); // Sets the TOK and ROK bits high
+
+
+//  ====Configuring receive buffer (RCR)=====
+
+// Before hoping to see a packet coming to you, you should tell the RTL8139 to accept packets based on various rules.
+// The configuration register is RCR.
+
+// You can enable different "matching" rules:
+
+//     AB - Accept Broadcast: Accept broadcast packets sent to mac ff:ff:ff:ff:ff:ff
+//     AM - Accept Multicast: Accept multicast packets.
+//     APM - Accept Physical Match: Accept packets send to NIC's MAC address.
+//     AAP - Accept All Packets. Accept all packets (run in promiscuous mode).
+
+// Another bit, the WRAP bit, controls the handling of receive buffer wrap around.
+
+// If WRAP is 0, the Rx buffer is treated as a traditional ring buffer:
+  //if a packet is being written near the end of the buffer and the RTL8139 knows you've already handled
+  //data before this (thanks to CAPR), the packet will continue at the beginning of the buffer.
+
+// If WRAP is 1, the remainder of the packet will be written contiguously
+  //(overflowing the actual receive buffer) so that it can be handled more efficiently.
+  //This means the buffer must be an additional 1500 bytes (to hold the largest potentially overflowing packet).
+
+// You can also tell the size of your RX buffer here, however if you use a 8k + 16
+  //buffer as described before, writing zeroes is enough.
+  //To use the WRAP=1 bit, an 8K buffer must in fact be 8k+16+1500 bytes.
+
+  __outportdw(IOADDR + 0x44, 0xf | (1 << 7)); // (1 << 7) is the WRAP bit, 0xf is AB+AM+APM+AAP
+
+
+// ==== Enable Receive and Transmitter ====
+
+// Now is the time to start up the RX and TX functions.
+//  This is quite an easy piece, and should (in my opinion) only be done after all
+//  of the configurations to the RTL8139's registers have been set to what is desired.
+//  The RE (Receiver Enabled) and the TE (Transmitter Enabled) bits are located in the Command Register (0x37).
+//  Starting up the RE and TE is pretty straight-forward, but lets go through it anyways.
+
+// To enable the RTL8139 to accept and transmit packets, the RE and TE bits must go high.
+// Once this is completed, then the card will start allowing packets in and/or out.
+
+  __outportb(IOADDR + 0x37, 0x0C); // Sets the RE and TE bits high
+
+  //Hago que todos los descriptores usen el mismo buffer
+  //En realidad voy a usar uno solo
+  __outportdw(TSAD0, (uint32_t)&transmission.frame);
+  __outportdw(TSAD1, (uint32_t)&transmission.frame);
+  __outportdw(TSAD2, (uint32_t)&transmission.frame);
+  __outportdw(TSAD3, (uint32_t)&transmission.frame);
+
+  //Seteo la MAC en el header del ethernet frame que vamos a usar
+  //Y lo guardo en el vector de informacion
   int i;
-  for(i = 0; i < mac_len; i++) {
-    transmission.frame.header.src[i] = __inportb(ioaddr + i);
-    mac_addr[i] = __inportb(ioaddr+i);
+  for(i=0; i < MAC_SIZE ; i++){
+    transmission.frame.hdr.src[i] = __inportb(IOADDR + i);
+    myMAC[i] = __inportb(IOADDR + i);
   }
-  __puts("mac aca!!!:");
-  __print_mac_address(transmission.frame.header.src);
+
+
+  currentDescriptor = 0;
 }
 
-// Should be called after handling an rtl interrupt.
-void __clear_interrupt_rtl() {
-  __outportw(ioaddr + isr_reg, 0x1);
+
+
+/*
+  Handler de la interrupcion del RTL.
+  El dispositivo interrumpe cuando termino de transmitir bien 
+  con el bit TRANSMIT_OK en 1, y cuando termino de recibir con RECEIVE_OK en 1
+  
+  No estan activadas las interrupciones en caso de error, y en todo caso
+  no se haría nada.
+
+  En caso de estar terminando una transmision no se hace nada,
+  si se recibio un paquete se llama a la rutina para guardar el mensaje
+  en el buffer de mensajes.
+*/
+void rtlHandler(){
+  int i;
+  uint16_t isr = __inportw(ISR);
+
+  if(isr & TRANSMIT_OK){ 
+    //Transmit OK - No hay que hacer nada
+  }
+
+  if(isr & RECEIVE_OK){
+    uint8_t * frame = receiveBuffer + RX_HEADER_SIZE;
+    if(checkMAC(frame))
+    { 
+      if(!is_connect(frame) && !is_disconnect(frame) && am_i_connected){
+        int broadcasting = is_broadcast(frame);
+        rtl_save_msg(broadcasting, receiveBuffer);
+      }
+      else if(is_connect(frame)){
+        uint8_t userID = *(receiveBuffer + USER_BYTE_OFFSET);
+  
+        if(!connected_users[userID]){
+          //Solo lo registro si no estaba conectado antes
+          //Puede ser que me llegue varias veces por lo que viene abajo
+          connected_users[userID] = 1;
+          
+          //Si estoy conectado tengo que mandar notificacion
+          //Para que el nuevo que se conecto sepa
+          if(am_i_connected){
+            rtl_notify_connection(1);
+          }
+        }
+
+      }else{
+        uint8_t userID = *(receiveBuffer + USER_BYTE_OFFSET);
+        connected_users[userID] = 0;
+      }
+    }
+  }
+
+  rtl_init(); //Reseteo el dispositivo porque si no no anda
 }
 
-void __rtl_handler() {
-  /* Do stuff */
-  __puts("Me llego algo\n");
+
+
+//Si la MAC coincide con FF:FF:FF:FF es un mensaje broadcast
+static int is_broadcast(uint8_t * frame){
+  for(int i = 0; i < MAC_SIZE ; i++){
+    if(frame[i] != 0xff){
+      return 0;
+    }
+  }
+  return 1;
+}
+
+//Si la MAC coincide con FF:FF:FF:FC es una notificacion de nueva conexion
+static int is_connect(uint8_t * frame){
+  for(int i = 0; i < MAC_SIZE -1 ; i++){
+    if(frame[i] != 0xff){
+      return 0;
+    }
+  }
+  return frame[MAC_SIZE - 1] == 0xfc;
+}
+
+
+//Si la MAC coincide con FF:FF:FF:FD es una notifiacion de desconexion
+static int is_disconnect(uint8_t * frame){
+  for(int i = 0; i < MAC_SIZE -1 ; i++){
+    if(frame[i] != 0xff){
+      return 0;
+    }
+  }
+  return frame[MAC_SIZE - 1] == 0xfd;
+}
+
+
+
+static int checkMAC(uint8_t* frame){
+  if(is_broadcast(frame) || is_connect(frame) || is_disconnect(frame)){
+    return 1;
+  }
+
+  //Chequeo con mi MAC
+  for(int i = 0; i < MAC_SIZE ; i++){
+    if(frame[i] != myMAC[i]){
+      return 0;
+    }
+  }
+  return 1;
+}
+
+
+
+
+
+/*
+  Esta funcion se llama cuando se recibe un mensaje nuevo.
+  message_buffer es un buffer circular con los paquetes que van
+  llegando. Cada slot del buffer indica en el campo "present" si
+  esta ocupado o no (se desocupa cuando se pide con next_msg)
+
+  Si el buffer esta lleno no se hace nada.
+
+*/
+static void rtl_save_msg(int is_broadcast, char * frame){ 
+  if(message_buffer[current].present == TRUE){
+    return; //Buffer lleno
+  }
+
+  message_buffer[current].present = TRUE; //Ocupo el slot
+  message_buffer[current].msg.broadcast = is_broadcast;
+  message_buffer[current].msg.user = frame[USER_BYTE_OFFSET];
+  message_buffer[current].time.day = 0;
+  message_buffer[current].time.month = 0;
+  message_buffer[current].time.year = 0;
+  message_buffer[current].time.hour = 0;
+  message_buffer[current].time.min = 0;
+
+  /*__puts("Saving msg: "); __puts(msg);
+  ncNewline();
+  */strcpy(message_buffer[current].msg.data, frame + RX_DATA_OFFSET);
+
+  current++;
+  current = current % MSG_BUF_SIZE; //Volver al principio si se pasa
+}
+
+
+
+/*
+  Se deja el mensaje no leido mas viejo en buf, copiando max_size caracteres
+  como maximo  (o MAX_MSG_SIZE si este es mas chico). Lo que no se copia se pierde.
+  
+  Se devuelve si el mensaje era broadcast (1) o privado (0)
+
+  Si no hay mensajes sin leer no se hace nada y se retorna -1.
+*/
+
+typedef struct{
+  int broadcast;
+  int user;
+  struct{
+    char day;
+    char month;
+    char year;
+    char hour;
+    char min;
+  } time;
+} msg_info;
+
+int rtl_next_msg(char* buf, void * info, int max_size){
+
+  if(message_buffer[pointer].present == FALSE){
+    return -1; //No hay nada todavia
+  }
+
+  max_size = max_size < MAX_MSG_SIZE ? max_size : MAX_MSG_SIZE; //Escribo como maximo min(max_size, MAX_MSG_SIZE)
+
+  char * next = message_buffer[pointer].msg.data;
+  strcpy(buf, next);
+
+  message_buffer[pointer].present = FALSE; //Apago ese slot, ya lo lei
   
 
-  // rtl sucks and needs to be reset.
-  __clear_interrupt_rtl();
-  __init_network();
+  ((msg_info*)info)->broadcast = message_buffer[pointer].msg.broadcast;
+  ((msg_info*)info)->user = message_buffer[pointer].msg.user;
+  ((msg_info*)info)->time.day = message_buffer[pointer].time.day;
+  ((msg_info*)info)->time.month = message_buffer[pointer].time.month;
+  ((msg_info*)info)->time.year = message_buffer[pointer].time.year;
+  ((msg_info*)info)->time.hour = message_buffer[pointer].time.hour;
+  ((msg_info*)info)->time.min = message_buffer[pointer].time.min;
+
+  pointer++;            //Avanzo en el buffer
+  pointer = pointer%MSG_BUF_SIZE;
+
+  return 0;
+  
+};
+
+
+
+/*
+Resetea el buffer de mensajes 
+(vacia los slots y pone los punteros al principio)
+*/
+void rtl_clear_msgs(){
+  int i;
+  for(i=0; i< MAX_MSG_SIZE; i++){
+    message_buffer[i].present = FALSE;
+  }
+
+  current = 0;
+  pointer = 0;
 }
 
 
-// de aca para abajo es robado de marcelo
+
+int rtl_get_active_users(int * vec){
+  int i;
+  int j = 0;
+
+  for(i = 0; i < MAX_USERS ; i++){
+    if(connected_users[i]){
+      vec[j++] = i;
+    }   
+  }
+
+  return j;
+}
+
+
+
+
 /*
   Envia un mensaje (null terminated) a la MAC que se envia como parametro
   Se leen los primeros 6 bytes a partir de la mac destino. 
+
   Se usa el frame de Ethernet II (https://en.wikipedia.org/wiki/Ethernet_frame#Ethernet_II)
   Que tiene la estructura de ethframe en <ethernet.h>: 6 bytes de MAC destino, 6 bytes de
   MAC origen, 2 bytes de protipo (se pone el dummy type), y el resto de los bytes con el cuerpo
   del mensaje. 
+
   Mas info del mecanismo en la programmers guide (http://www.cs.usfca.edu/~cruse/cs326f04/RTL8139_ProgrammersGuide.pdf)
   y la data sheet para los registros (http://www.cs.usfca.edu/~cruse/cs326f04/RTL8139D_DataSheet.pdf)
+
 */
 void rtl_send(char * msg, int dst){
+
   int i;
 
   if(dst < 0){ 
-    for(i = 0; i < mac_len ; i++)
-      transmission.frame.header.dest[i] = '\xff';
+  //Broadcast
+  for(i=0; i < MAC_SIZE ; i++){
+    transmission.frame.hdr.dst[i] = '\xff';
+  }
   } else {
     //Mensaje privado
-    transmission.frame.header.dest[0] = '\xBA';
-    transmission.frame.header.dest[1] = '\xDA';
-    transmission.frame.header.dest[2] = '\x55';
-    transmission.frame.header.dest[3] = '\xEE';
-    transmission.frame.header.dest[4] = '\x55';
-    transmission.frame.header.dest[5] = dst;
+    transmission.frame.hdr.dst[0] = '\xBA';
+    transmission.frame.hdr.dst[1] = '\xDA';
+    transmission.frame.hdr.dst[2] = '\x55';
+    transmission.frame.hdr.dst[3] = '\xEE';
+    transmission.frame.hdr.dst[4] = '\x55';
+    transmission.frame.hdr.dst[5] = dst;
   }
 
-  __print_mac_address(transmission.frame.header.dest);
-
-  uint32_t tsd = tsd0 + (cur_descriptor * 4);
-  uint32_t tsad = tsad0 + (cur_descriptor * 4);
+  uint32_t tsd = TSD0 + (currentDescriptor * 4);
+  uint32_t tsad = TSAD0 + (currentDescriptor * 4);
 
 
-  transmission.frame.header.proto = eth_p_802_3; //Dummy type
+  transmission.frame.hdr.proto = ETH_P_802_3; //Dummy type
 
   memcpy(transmission.frame.data, msg, strlen(msg));
 
 
-  uint32_t descriptor = eth_head_len + strlen(msg); //Bits 0-12: Size
+  uint32_t descriptor = ETH_HLEN + strlen(msg); //Bits 0-12: Size
   transmission.size = descriptor; 
-  descriptor &= ~(tsd_own); //Apago el bit 13 TSD_OWN
+  descriptor &= ~(TSD_OWN); //Apago el bit 13 TSD_OWN
   descriptor &= ~(0x3f << 16);  // 21-16 threshold en 0
   
-  while (!(__inportdw(tsd) & tsd_own));
+  while (!(__inportdw(tsd) & TSD_OWN))
+    ;
 
   __outportdw(tsd, descriptor);
 }
 
 
-// ends stolen
 
 
-uint16_t __rtl_vendor_id() {
-  return rtl_vendor_id;
-}
-
-uint16_t __rtl_device_id() {
-  return rtl_device_id;
-}
-
-void __set_up_rtl_bus_mastering() {
-  PCI_Descriptor_t rtl_descriptor = __get_rtl_descriptor();
-  __print_pci_descriptor(rtl_descriptor);
-  //WTF WHY DOES THE FIRST DIGIT NOT WORK??? THIS RETURNS 0x07 ON THE REGISTER.
-  __pci_write(rtl_descriptor->bus, rtl_descriptor->device, rtl_descriptor->function, 0x04, 0x7);
-
-/*
-15  14  13  12  11      10              9           8        
-|----RESERVED-----||int disable||fast b2b enab||SERR# enable|
-
-     7           6           5             4      
-|RESERVED||parity error||vga palette||memory write|
-
-     3           2            1           0
-|spec. cyc||bus master||memory space||I/O space|
-
-15  14  13  12  11  10  9  8  7  6  5  4  3  2  1  0
- 0   0   0   0   0   0  0  0  0  0  0  1  0  1  1  1
---------------  ------------  ----------  -----------
-      0               0            1           7 
-Interrupt Disable:
-If set to 1 the assertion of the devices INTx# signal is disabled; otherwise, assertion of the signal is enabled.
-Fast Back-Back Enable:
-If set to 1 indicates a device is allowed to generate fast back-to-back transactions; otherwise, fast back-to-back transactions are only allowed to the same agent.
-SERR# Enable:
-If set to 1 the SERR# driver is enabled; otherwise, the driver is disabled.
-Bit 7:
-As of revision 3.0 of the PCI local bus specification this bit is hardwired to 0. In earlier versions of the specification this bit was used by devices and may have been hardwired to 0, 1, or implemented as a read/write bit.
-Parity Error Response:
-If set to 1 the device will take its normal action when a parity error is detected; otherwise, when an error is detected, the device will set bit 15 of the Status register (Detected Parity Error Status Bit), but will not assert the PERR# (Parity Error) pin and will continue operation as normal.
-VGA Palette Snoop:
-If set to 1 the device does not respond to palette register writes and will snoop the data; otherwise, the device will trate palette write accesses like all other accesses.
-Memory Write and Invalidate Enable:
-If set to 1 the device can generate the Memory Write and Invalidate command; otherwise, the Memory Write command must be used.
-Special Cycles:
-If set to 1 the device can monitor Special Cycle operations; otherwise, the device will ignore them.
-Bus Master:
-If set to 1 the device can behave as a bus master; otherwise, the device can not generate PCI accesses.
-Memory Space:
-If set to 1 the device can respond to Memory Space accesses; otherwise, the device's response is disabled.
-I/O Space:
-If set to 1 the device can respond to I/O Space accesses; otherwise, the device's response is disabled.
-*/
-}
-
-
-uint8_t * __get_own_mac(uint8_t mac_buffer[mac_len]) {
+void rtl_notify_connection(int connect){
+  uint32_t tsd = TSD0 + (currentDescriptor * 4);
+  uint32_t tsad = TSAD0 + (currentDescriptor * 4);
   int i;
-  for(i = 0; i < mac_len; i++) {
-    mac_buffer[i] = mac_addr[i];
+
+  for(i=0; i < MAC_SIZE - 1; i++){
+    transmission.frame.hdr.dst[i] = '\xff';
   }
 
-  return mac_buffer;
+  am_i_connected = connect;
+
+  transmission.frame.hdr.dst[MAC_SIZE - 1] = connect ? 0xfc : 0xfd;
+  transmission.frame.hdr.proto = ETH_P_802_3; //Dummy type
+
+  uint32_t descriptor = ETH_HLEN; //Bits 0-12: Size
+  transmission.size = descriptor; 
+  descriptor &= ~(TSD_OWN); //Apago el bit 13 TSD_OWN
+  descriptor &= ~(0x3f << 16);  // 21-16 threshold en 0
+  
+  while (!(__inportdw(tsd) & TSD_OWN))
+    ;
+
+  __outportdw(tsd, descriptor);
+
 }
 
-void __print_mac_address(uint8_t mac_addr[mac_len]) {
-  for (int i = 0; i < 6; ++i) {
-    __print_hex(mac_addr[i]);
-    __puts(":");
-  }
-}
 
-void __print_own_mac() {
-  uint8_t buf[6];
-  __print_mac_address(__get_own_mac(buf));
-}
-// Debug
+//LO QUE SIGUE ES PARA DEBUG
 
-void __print_rtl_status() {
-  uint16_t isr = __inportw(ioaddr + isr_reg);
-  __puts("TRANSMIT_OK: ");
-  __print_hex(isr & transmit_ok);
-  __puts("\nRECEIVE OK: ");
-  __print_hex(isr & receive_ok);
-  __puts("\n");
-  __puts("RECEIVE_TRANSMIT: ");
-  __print_hex(__inportb(ioaddr + cmd_reg));
-}
-
+static int count = 0;
 void _debug_rtl_handler(){
-  uint16_t isr = __inportw(ioaddr + isr_reg);
+  ncClear();
+  uint16_t isr = __inportw(ISR);
 
-  __outportw(isr, 0x0);
-  __new_line();
-  __puts("Interrupting with ISR: ");
-  __print_hex(isr);
-  __new_line();
+  __outportw(ISR, 0x0);
+  ncNewline();
+  __puts("Interrupting with ISR: "); __print_hex(isr);
+  __puts("  count: ");
+  __print_base(count++, 10);
+  ncNewline();
 
+
+  ncClear(); 
+  ncNewline();ncNewline();ncNewline();ncNewline();ncNewline();ncNewline();ncNewline();
   int i;
-  if(isr & transmit_ok){ //Transmit OK
+  __puts("ISR: "); __print_hex(isr); ncNewline();
+  if(isr & TRANSMIT_OK){ //Transmit OK
   
     __puts("Transmitted ");
-    ncPrintDec(transmission.size);
+    __print_base(transmission.size, 10);
     __puts(" bytes.");
-    __new_line();
+    ncNewline();
 
     __puts("Sent: ");
     uint8_t * buf = ((uint8_t*)(&transmission.frame));
-    for(i = 0; i < 30 ; i++){
-      __puts(buf[i]);
-      __puts(" ");
-    }
-
-    __new_line();
-
-  }
-
-  if(isr & receive_ok){
-    __puts("Just recieved a package. It starts like this:");
-
-    uint8_t * buf = ((uint8_t*)rx_buffer);
     for(i = 0; i < 30 ; i++){
       __print_hex(buf[i]);
       __puts(" ");
     }
 
-    __new_line();
+    ncNewline();
 
-    //rtl_save_msg(1, receiveBuffer + RX_DATA_OFFSET);
   }
 
-  __init_network();
+  if(isr & RECEIVE_OK){
+    __puts("Just recieved a package. It starts like this:");
+
+    uint8_t * buf = ((uint8_t*)receiveBuffer);
+    for(i = 0; i < 30 ; i++){
+      __print_hex(buf[i]);
+      __puts(" ");
+    }
+
+    ncNewline();
+
+    rtl_save_msg(1, receiveBuffer + RX_DATA_OFFSET);
+  }
+
+  rtl_init(); //Reseteo el dispositivo porque si no no anda
+}
+
+
+void rtlPrintMac(){
+  __puts("MAC: ");
+  __print_hex(__inportb(IOADDR));
+  __puts(":");
+  __print_hex(__inportb(IOADDR + 1));
+  __puts(":");
+  __print_hex(__inportb(IOADDR + 2));
+  __puts(":");
+  __print_hex(__inportb(IOADDR + 3));  
+  __puts(":");
+  __print_hex(__inportb(IOADDR + 4));  
+  __puts(":");
+  __print_hex(__inportb(IOADDR + 5));  
+}
+
+
+
+
+
+void printDetails(char* msg){
+  ncNewline();
+  __puts(msg);
+  __puts("   TSD0: 0x");
+  __print_hex(__inportdw(TSD0));
+  ncNewline();
+  __puts("TSD1: 0x");
+  __print_hex(__inportdw(TSD1));
+  ncNewline();
+  __puts("TSD2: 0x");
+  __print_hex(__inportdw(TSD2));
+  ncNewline();
+  __puts("TSD3: 0x");
+  __print_hex(__inportdw(TSD3));
+  ncNewline();
+
 }

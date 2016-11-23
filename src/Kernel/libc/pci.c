@@ -126,7 +126,7 @@ PCI_Descriptor_t __get_rtl_descriptor() {
     for(device = 0; device < 32; device++) {
       for(function = 0 ; function < 8; function++) {
         PCI_Descriptor_t descriptor = __get_descriptor(bus, device, function);
-        if(descriptor->vendor_id == __rtl_vendor_id()) {
+        if(descriptor->vendor_id == 0x10EC){//__rtl_vendor_id()) {
           return descriptor;
         }
       }
