@@ -13,7 +13,7 @@ EXTERN __irq_dispatcher
 section .text
 
 irq11Handler:
-	irqHandler 11
+	irq_slave_handler 11
 
 irq1Handler:
 	irqHandler 1
@@ -41,7 +41,7 @@ __set_pic_slave_asm:
 	push	rbp
 	mov		rbp, rsp
 
-	mov		rax, rdi
+	mov		ax, di
 	out		0xA1, al
 
 	leave

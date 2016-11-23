@@ -48,3 +48,16 @@
 
 	iretq
 %endmacro
+
+%macro irq_slave_handler 1
+	pushaq
+
+	mov	rdi, %1
+	call __irq_dispatcher
+	mov al, 20h ; EOI
+	out 0xA0, al
+	out 20h, al
+
+	popaq
+	iretq
+%endmacro
