@@ -8,6 +8,33 @@
 
 void * _memalloc(uint64_t size);
 
+#define ioaddr        0xC000
+#define cmd_reg       0x37
+#define rbstart_reg   0x30
+#define config_1_reg  0x52
+#define imr_reg       0x3C
+#define isr_reg       0x3E
+
+#define rtl_vendor_id 0x10EC
+#define rtl_device_id 0x8139
+#define rtl_interrupt 0x0B;
+
+#define tsad0 (ioaddr + 0x20)
+#define tsad1 (ioaddr + 0x24)
+#define tsad2 (ioaddr + 0x28)
+#define tsad3 (ioaddr + 0x2C)
+
+#define tsd0 (ioaddr + 0x10)
+#define tsd1 (ioaddr + 0x14)
+#define tsd2 (ioaddr + 0x18)
+#define tsd3 (ioaddr + 0x1C)
+
+#define tsd_own (1 << 13)
+#define transmit_ok (1 << 2)
+#define receive_ok  1
+
+#define buffer_len 8*1024+16
+
 #define IOADDR 0xC000
 
 #define TSAD0 (IOADDR + 0x20)
@@ -245,6 +272,7 @@ void rtlHandler(){
   int i;
   uint16_t isr = __inportw(ISR);
 
+  __puts("GOT HERE");
   if(isr & TRANSMIT_OK){ 
     //Transmit OK - No hay que hacer nada
   }
@@ -359,7 +387,7 @@ static void rtl_save_msg(int is_broadcast, char * frame){
   message_buffer[current].time.min = 0;
 
   /*__puts("Saving msg: "); __puts(msg);
-  ncNewline();
+  __new_line();
   */strcpy(message_buffer[current].msg.data, frame + RX_DATA_OFFSET);
 
   current++;
@@ -538,27 +566,26 @@ void rtl_notify_connection(int connect){
 
 static int count = 0;
 void _debug_rtl_handler(){
-  ncClear();
+  __clear_screen();
   uint16_t isr = __inportw(ISR);
 
   __outportw(ISR, 0x0);
-  ncNewline();
+  __new_line();
   __puts("Interrupting with ISR: "); __print_hex(isr);
   __puts("  count: ");
   __print_base(count++, 10);
-  ncNewline();
+  __new_line();
 
-
-  ncClear(); 
-  ncNewline();ncNewline();ncNewline();ncNewline();ncNewline();ncNewline();ncNewline();
+  //__clear_screen(); 
+  __new_line();__new_line();__new_line();__new_line();__new_line();__new_line();__new_line();
   int i;
-  __puts("ISR: "); __print_hex(isr); ncNewline();
+  __puts("ISR: "); __print_hex(isr); __new_line();
   if(isr & TRANSMIT_OK){ //Transmit OK
   
     __puts("Transmitted ");
     __print_base(transmission.size, 10);
     __puts(" bytes.");
-    ncNewline();
+    __new_line();
 
     __puts("Sent: ");
     uint8_t * buf = ((uint8_t*)(&transmission.frame));
@@ -567,7 +594,7 @@ void _debug_rtl_handler(){
       __puts(" ");
     }
 
-    ncNewline();
+    __new_line();
 
   }
 
@@ -580,7 +607,7 @@ void _debug_rtl_handler(){
       __puts(" ");
     }
 
-    ncNewline();
+    __new_line();
 
     rtl_save_msg(1, receiveBuffer + RX_DATA_OFFSET);
   }
@@ -609,19 +636,30 @@ void rtlPrintMac(){
 
 
 void printDetails(char* msg){
-  ncNewline();
+  __new_line();
   __puts(msg);
   __puts("   TSD0: 0x");
   __print_hex(__inportdw(TSD0));
-  ncNewline();
+  __new_line();
   __puts("TSD1: 0x");
   __print_hex(__inportdw(TSD1));
-  ncNewline();
+  __new_line();
   __puts("TSD2: 0x");
   __print_hex(__inportdw(TSD2));
-  ncNewline();
+  __new_line();
   __puts("TSD3: 0x");
   __print_hex(__inportdw(TSD3));
-  ncNewline();
+  __new_line();
 
+}
+
+void __print_rtl_status() {
+  uint16_t isr = __inportw(ioaddr + isr_reg);
+  __puts("TRANSMIT_OK: ");
+  __print_hex(isr & transmit_ok);
+  __puts("\nRECEIVE OK: ");
+  __print_hex(isr & receive_ok);
+  __puts("\n");
+  __puts("RECEIVE_TRANSMIT: ");
+  __print_hex(__inportb(ioaddr + cmd_reg));
 }

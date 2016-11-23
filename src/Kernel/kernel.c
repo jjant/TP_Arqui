@@ -33,6 +33,7 @@ int main() {
 	__puts("   Done.\n");
 	__puts("[Initializing ethernet device]...");
 	//__init_network();
+	rtl_init();
 	__puts("   Done.\n");
 	/*
 	__puts("Register status on rtl: 0x");
@@ -48,6 +49,8 @@ int main() {
 	sti();
 
 	//__puts("[Starting console]...\n");
+		__print_rtl_status();
+
 	__puts("My mac address: ");
 	//__print_own_mac();
 	__puts("\n");
@@ -68,8 +71,10 @@ int main() {
 	/*__get_own_mac(mac_addr);
 	for (int i = 0; i < 6; ++i) {
 		__print_hex(mac_addr[i]);
-	}
+	}*/
 	__print_rtl_status();
+	rtlPrintMac();
+	_debug_rtl_handler();
 	//_debug_rtl_handler();
 	/*__int_2B();
 	__int_2B();
