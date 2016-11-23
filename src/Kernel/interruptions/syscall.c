@@ -8,6 +8,7 @@
 #define INTERRUPT_VECTOR	0x80
 #define SYSCALL_SIZE 256
 
+#define SYSCALL_SEND_MESSAGE        9
 #define SYSCALL_READ_MESSAGE        8
 #define SYSCALL_RESERVE_MEMORY      7
 #define SYSCALL_PRIVATE_LINE        6
@@ -37,6 +38,7 @@ static void __setup_syscalls() {
   syscall[SYSCALL_KEYBOARD_LANGUAGE] = __change_keyboard;
   syscall[SYSCALL_PRIVATE_LINE]      = __private_line;
 // syscall[SYSCALL_READ_MESSAGE]      = __read_message;
+// syscall[SYSCALL_SEND_MESSAGE]      = __send_message;
 	syscall[SYSCALL_RESERVE_MEMORY]    = __malloc;
 }
 

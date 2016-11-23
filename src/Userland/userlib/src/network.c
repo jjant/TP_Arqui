@@ -1,9 +1,5 @@
 #include <network.h>
 
-void send_message(uint8_t user, const char * message) {
-  return;
-}
-
 char * read_message() {
   static uint8_t last_idx = 0;
   static uint8_t first_idx = 0;
