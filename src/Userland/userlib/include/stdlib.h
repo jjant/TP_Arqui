@@ -6,10 +6,9 @@
 #define NULL 0
 #endif
 
+void * malloc(uint64_t bytes);
 
-//void * malloc(uint64_t bytes);
-
-//void free(void * ptr);
+void free(void * ptr);
 
 void * realloc(void * ptr, uint64_t size);
 

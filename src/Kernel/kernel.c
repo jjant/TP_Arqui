@@ -12,13 +12,46 @@
 
 typedef int (*EntryPoint)();
 
+
+
+
+int main() {
+
+	initInterruptions();
+
+	//checkAllBuses(0, 1);
+	deviceDetails(0, 0x18);
+	//while(1);
+
+	
+	//Inicializo la DMA y el RTL 
+	dma_init();
+	findRTL();
+	rtl_init();
+	rtcInit();
+
+	rtlPrintMac();
+
+	((EntryPoint)(0x400000))();
+
+	return 0;
+}
+
+/*
 int main() {
 	uint16_t cmd_status;
 	uint8_t mac_addr[6];
 	char buffer[10];
 
-	initInterruptions();
+	deviceDetails(0, 0x18);
 
+	initInterruptions();
+	dma_init();
+	findRTL();
+	rtl_init();
+	rtcInit();
+
+	rtlPrintMac();
 	/*
 	__clear_screen();
 	__new_line();
@@ -50,7 +83,7 @@ int main() {
 	__print_hex(__get_rtl_descriptor()->interrupt);
 	*/
 
-	sti();
+	//sti();
 
 	//__puts("[Starting console]...\n");
 	//	__print_rtl_status();
@@ -62,9 +95,9 @@ int main() {
 	//__print_rtl_status();
 	//print_all_devices();
 	//_debug_rtl_handler();
-	__puts("Sending message to rtl...");
+	//__puts("Sending message to rtl...");
 	//rtl_send("la concha de tu madre", 0x0);
-	__puts("   Done.\n");
+	//__puts("   Done.\n");
 
 	//__puts("mac addr:");
 
@@ -87,8 +120,8 @@ int main() {
 	//__clear_screen();
 	//__puts("rtl desc:\n");
 	
-	((EntryPoint)0x400000)(); // Start the console
-	__puts("After console");
+	//((EntryPoint)0x400000)(); // Start the console
+	//__puts("After console");
 	
-	return 0;
-}
+//	return 0;
+//}

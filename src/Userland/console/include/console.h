@@ -5,7 +5,7 @@
 
 
 #define NULL (void *)0
-#define MAX_ARGS		50
+#define MAX_ARGS		2
 
 typedef uint16_t (* shell_program)(const char **);
 
@@ -31,6 +31,7 @@ uint16_t shell_text(const char **);
 uint16_t shell_colorscheme(const char **);
 uint16_t shell_null(const char **);
 uint16_t shell_echo(const char **);
+uint16_t shell_chat(const char **);
 void clean_buffer(char *, uint16_t);
 
 #endif

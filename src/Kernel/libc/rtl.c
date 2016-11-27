@@ -226,6 +226,8 @@ void rtl_init(){
 
 
   currentDescriptor = 0;
+
+  ncPrint("Initialized rtl");
 }
 
 
@@ -480,11 +482,11 @@ void rtl_send(char * msg, int dst){
   }
   } else {
     //Mensaje privado
-    transmission.frame.hdr.dst[0] = '\xDE';
-    transmission.frame.hdr.dst[1] = '\xAD';
-    transmission.frame.hdr.dst[2] = '\xC0';
-    transmission.frame.hdr.dst[3] = '\xFF';
-    transmission.frame.hdr.dst[4] = '\xEE';
+    transmission.frame.hdr.dst[0] = '\xBA';
+    transmission.frame.hdr.dst[1] = '\xDA';
+    transmission.frame.hdr.dst[2] = '\x55';
+    transmission.frame.hdr.dst[3] = '\xEE';
+    transmission.frame.hdr.dst[4] = '\x55';
     transmission.frame.hdr.dst[5] = dst;
   }
 

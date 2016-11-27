@@ -6,7 +6,7 @@
 #define RAND_MAX 32767
 
 
-void * malloc(unsigned int size) {
+/*void * malloc(unsigned int size) {
   return reserve_memory(size);
 }
 
@@ -17,23 +17,23 @@ void * calloc(unsigned int size) {
 void free() {
   return;
 }
-/*
+*/
 void* malloc(uint64_t bytes){
   void * ret = (void*)sys_memalloc(bytes);
   return ret;
 }
-*/
+
 static void * mem_pointer = (void*)0x1000000; //Doy memoria a partir del 10mo mega porque pinta
 void * myalloc(uint64_t size){
   void * ptr = mem_pointer;
   mem_pointer += size; 
   return ptr;
 }
-/*
+
 void free(void * ptr){
   return;
 }
-*/
+
 void* realloc(void * ptr, uint64_t size){
   return ptr;
 }
