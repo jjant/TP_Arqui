@@ -16,6 +16,10 @@ int main() {
 	uint16_t cmd_status;
 	uint8_t mac_addr[6];
 	char buffer[10];
+
+	initInterruptions();
+
+	/*
 	__clear_screen();
 	__new_line();
 	__puts("[Initializing IDT]...");
@@ -49,17 +53,17 @@ int main() {
 	sti();
 
 	//__puts("[Starting console]...\n");
-		__print_rtl_status();
+	//	__print_rtl_status();
 
-	__puts("My mac address: ");
+	//__puts("My mac address: ");
 	//__print_own_mac();
-	__puts("\n");
+	//__puts("\n");
 
 	//__print_rtl_status();
 	//print_all_devices();
 	//_debug_rtl_handler();
 	__puts("Sending message to rtl...");
-	rtl_send("la concha de tu madre", 0x0);
+	//rtl_send("la concha de tu madre", 0x0);
 	__puts("   Done.\n");
 
 	//__puts("mac addr:");
@@ -72,9 +76,9 @@ int main() {
 	for (int i = 0; i < 6; ++i) {
 		__print_hex(mac_addr[i]);
 	}*/
-	__print_rtl_status();
-	rtlPrintMac();
-	_debug_rtl_handler();
+	//__print_rtl_status();
+	//rtlPrintMac();
+	//_debug_rtl_handler();
 	//_debug_rtl_handler();
 	/*__int_2B();
 	__int_2B();
@@ -82,7 +86,9 @@ int main() {
 	__int_2B();*/
 	//__clear_screen();
 	//__puts("rtl desc:\n");
-	//((EntryPoint)0x400000)(); // Start the console
-
+	
+	((EntryPoint)0x400000)(); // Start the console
+	__puts("After console");
+	
 	return 0;
 }

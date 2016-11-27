@@ -1,3 +1,6 @@
+#define __ignore_code
+#ifndef __ignore_code
+
 #include <syscall.h>
 #include <interruptions.h>
 #include <stdint.h>
@@ -53,3 +56,5 @@ void __write(char * str, size_t sz) {
 		__putc(str[i]);
 }
 
+
+#endif

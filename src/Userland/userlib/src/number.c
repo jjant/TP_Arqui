@@ -1,3 +1,6 @@
+#define __ignore_code
+#ifndef __ignore_code
+
 #include <string.h>
 #include <number.h>
 
@@ -15,3 +18,5 @@ void itoa(int n, char * s) {
 
   reverse(s);
 }
+
+#endif

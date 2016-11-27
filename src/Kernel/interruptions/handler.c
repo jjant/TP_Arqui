@@ -1,8 +1,12 @@
+#define __ignore_code
+#ifndef __ignore_code
+
 #include <handler.h>
 #include <keyboard.h>
 #include <video.h>
 #include <ethernet.h>
 #include <stdint.h>
+#include <tick.h>
 
 void __set_pic_slave_asm(uint8_t);
 void __set_pic_slave_asm(uint8_t);
@@ -35,3 +39,5 @@ void __set_pic_master(uint8_t data) {
 void __set_pic_slave(uint8_t data) {
   __set_pic_slave_asm(data);
 }
+
+#endif

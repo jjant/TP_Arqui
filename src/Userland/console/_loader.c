@@ -12,8 +12,8 @@ int _start() {
 	//Clean BSS
 	memset(&bss, 0, &endOfBinary - &bss);
 
-	return main();
-
+	//return main();
+  return 1;
 }
 
 void * memset(void * destination, int32_t c, uint64_t length) {

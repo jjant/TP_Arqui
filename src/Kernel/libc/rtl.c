@@ -1,43 +1,13 @@
-#define __ignore_code
-#ifndef __ignore_code
-
-
-#include <ethernet.h>
-#include <ports.h>
+//http://wiki.osdev.org/RTL8139
+#include <port.h>
+#include <rtl.h>
+#include <rtc.h>
 #include <stdint.h>
-#include <memory.h>
-#include <pci.h>
-#include <lib.h>
-
+#include <string.h>
+#include <naiveConsole.h>
+#include <ethernet.h>
 
 void * _memalloc(uint64_t size);
-
-#define ioaddr        0xC000
-#define cmd_reg       0x37
-#define rbstart_reg   0x30
-#define config_1_reg  0x52
-#define imr_reg       0x3C
-#define isr_reg       0x3E
-
-#define rtl_vendor_id 0x10EC
-#define rtl_device_id 0x8139
-#define rtl_interrupt 0x0B;
-
-#define tsad0 (ioaddr + 0x20)
-#define tsad1 (ioaddr + 0x24)
-#define tsad2 (ioaddr + 0x28)
-#define tsad3 (ioaddr + 0x2C)
-
-#define tsd0 (ioaddr + 0x10)
-#define tsd1 (ioaddr + 0x14)
-#define tsd2 (ioaddr + 0x18)
-#define tsd3 (ioaddr + 0x1C)
-
-#define tsd_own (1 << 13)
-#define transmit_ok (1 << 2)
-#define receive_ok  1
-
-#define buffer_len 8*1024+16
 
 #define IOADDR 0xC000
 
@@ -157,7 +127,7 @@ void rtl_init(){
   //  Send 0x00 to the CONFIG_1 register (0x52) to set the LWAKE + LWPTN to active high.
   //  This should essentially power on the device. */
 
-  __outportb( IOADDR + 0x52, 0x0); //Power on
+  sysOutByte( IOADDR + 0x52, 0x0); //Power on
 
 
 // ==== Software Reset! =======
@@ -169,9 +139,8 @@ void rtl_init(){
 
   // NB: There is a minor bug in Qemu. If you check the command register before performing a soft reset,
   // you may find the RST bit is high (1). Just ignore it and carry on with the initialization procedure.
-  __outportb( IOADDR + 0x37, 0x10);
-
-  while( (__inportb(IOADDR + 0x37) & 0x10) != 0) { /* nada */ }
+  sysOutByte( IOADDR + 0x37, 0x10);
+  while( (sysInByte(IOADDR + 0x37) & 0x10) != 0) { /* nada */ }
 
 
   //Init Receive buffer
@@ -180,9 +149,9 @@ void rtl_init(){
     //One way to do it, would be to define a buffer variable and send that variables memory location
 
   //ioaddr is obtained from PCI configuration
-  //__outportdw(IOADDR + 0x30, (uintptr_t)rx_buffer);  send uint32_t memory location to RBSTART (0x30)
+  //sysOutLong(IOADDR + 0x30, (uintptr_t)rx_buffer);  send uint32_t memory location to RBSTART (0x30)
   //to the RBSTART register (0x30).
-  __outportdw(IOADDR + 0x30, (uint32_t)receiveBuffer);
+  sysOutLong(IOADDR + 0x30, (uint32_t)receiveBuffer);
 
 
  //===Set IMR + ISR=======
@@ -194,7 +163,7 @@ void rtl_init(){
     // To set the RTL8139 to accept only the Transmit OK (TOK) and Receive OK (ROK) interrupts,
     // we would have the TOK and ROK bits of the IMR high and leave the rest low.
     // That way when a TOK or ROK IRQ happens, it actually will go through and fire up an IRQ.
-  __outportw(IOADDR + 0x3C, 0x000f); // Sets the TOK and ROK bits high
+  sysOutWord(IOADDR + 0x3C, 0x000f); // Sets the TOK and ROK bits high
 
 
 //  ====Configuring receive buffer (RCR)=====
@@ -223,7 +192,7 @@ void rtl_init(){
   //buffer as described before, writing zeroes is enough.
   //To use the WRAP=1 bit, an 8K buffer must in fact be 8k+16+1500 bytes.
 
-  __outportdw(IOADDR + 0x44, 0xf | (1 << 7)); // (1 << 7) is the WRAP bit, 0xf is AB+AM+APM+AAP
+  sysOutLong(IOADDR + 0x44, 0xf | (1 << 7)); // (1 << 7) is the WRAP bit, 0xf is AB+AM+APM+AAP
 
 
 // ==== Enable Receive and Transmitter ====
@@ -237,21 +206,22 @@ void rtl_init(){
 // To enable the RTL8139 to accept and transmit packets, the RE and TE bits must go high.
 // Once this is completed, then the card will start allowing packets in and/or out.
 
-  __outportb(IOADDR + 0x37, 0x0C); // Sets the RE and TE bits high
+  sysOutByte(IOADDR + 0x37, 0x0C); // Sets the RE and TE bits high
+
 
   //Hago que todos los descriptores usen el mismo buffer
   //En realidad voy a usar uno solo
-  __outportdw(TSAD0, (uint32_t)&transmission.frame);
-  __outportdw(TSAD1, (uint32_t)&transmission.frame);
-  __outportdw(TSAD2, (uint32_t)&transmission.frame);
-  __outportdw(TSAD3, (uint32_t)&transmission.frame);
+  sysOutLong(TSAD0, (uint32_t)&transmission.frame);
+  sysOutLong(TSAD1, (uint32_t)&transmission.frame);
+  sysOutLong(TSAD2, (uint32_t)&transmission.frame);
+  sysOutLong(TSAD3, (uint32_t)&transmission.frame);
 
   //Seteo la MAC en el header del ethernet frame que vamos a usar
   //Y lo guardo en el vector de informacion
   int i;
   for(i=0; i < MAC_SIZE ; i++){
-    transmission.frame.hdr.src[i] = __inportb(IOADDR + i);
-    myMAC[i] = __inportb(IOADDR + i);
+    transmission.frame.hdr.src[i] = sysInByte(IOADDR + i);
+    myMAC[i] = sysInByte(IOADDR + i);
   }
 
 
@@ -274,9 +244,8 @@ void rtl_init(){
 */
 void rtlHandler(){
   int i;
-  uint16_t isr = __inportw(ISR);
+  uint16_t isr = sysInWord(ISR);
 
-  __puts("GOT HERE");
   if(isr & TRANSMIT_OK){ 
     //Transmit OK - No hay que hacer nada
   }
@@ -384,15 +353,15 @@ static void rtl_save_msg(int is_broadcast, char * frame){
   message_buffer[current].present = TRUE; //Ocupo el slot
   message_buffer[current].msg.broadcast = is_broadcast;
   message_buffer[current].msg.user = frame[USER_BYTE_OFFSET];
-  message_buffer[current].time.day = 0;
-  message_buffer[current].time.month = 0;
-  message_buffer[current].time.year = 0;
-  message_buffer[current].time.hour = 0;
-  message_buffer[current].time.min = 0;
+  message_buffer[current].time.day = getDayOfMonth();
+  message_buffer[current].time.month = getMonth();
+  message_buffer[current].time.year = getYear();
+  message_buffer[current].time.hour = getHours();
+  message_buffer[current].time.min = getMinutes();
 
-  /*__puts("Saving msg: "); __puts(msg);
-  __new_line();
-  */strcpy(message_buffer[current].msg.data, frame + RX_DATA_OFFSET);
+  /*ncPrint("Saving msg: "); ncPrint(msg);
+  ncNewline();
+  */strncpy(message_buffer[current].msg.data, frame + RX_DATA_OFFSET, MAX_MSG_SIZE);
 
   current++;
   current = current % MSG_BUF_SIZE; //Volver al principio si se pasa
@@ -430,7 +399,7 @@ int rtl_next_msg(char* buf, void * info, int max_size){
   max_size = max_size < MAX_MSG_SIZE ? max_size : MAX_MSG_SIZE; //Escribo como maximo min(max_size, MAX_MSG_SIZE)
 
   char * next = message_buffer[pointer].msg.data;
-  strcpy(buf, next);
+  strncpy(buf, next, MAX_MSG_SIZE);
 
   message_buffer[pointer].present = FALSE; //Apago ese slot, ya lo lei
   
@@ -482,6 +451,9 @@ int rtl_get_active_users(int * vec){
 }
 
 
+int rtl_get_id(){
+  return myMAC[5];
+}
 
 
 /*
@@ -508,11 +480,11 @@ void rtl_send(char * msg, int dst){
   }
   } else {
     //Mensaje privado
-    transmission.frame.hdr.dst[0] = '\xBA';
-    transmission.frame.hdr.dst[1] = '\xDA';
-    transmission.frame.hdr.dst[2] = '\x55';
-    transmission.frame.hdr.dst[3] = '\xEE';
-    transmission.frame.hdr.dst[4] = '\x55';
+    transmission.frame.hdr.dst[0] = '\xDE';
+    transmission.frame.hdr.dst[1] = '\xAD';
+    transmission.frame.hdr.dst[2] = '\xC0';
+    transmission.frame.hdr.dst[3] = '\xFF';
+    transmission.frame.hdr.dst[4] = '\xEE';
     transmission.frame.hdr.dst[5] = dst;
   }
 
@@ -530,10 +502,10 @@ void rtl_send(char * msg, int dst){
   descriptor &= ~(TSD_OWN); //Apago el bit 13 TSD_OWN
   descriptor &= ~(0x3f << 16);  // 21-16 threshold en 0
   
-  while (!(__inportdw(tsd) & TSD_OWN))
+  while (!(sysInLong(tsd) & TSD_OWN))
     ;
 
-  __outportdw(tsd, descriptor);
+  sysOutLong(tsd, descriptor);
 }
 
 
@@ -558,10 +530,10 @@ void rtl_notify_connection(int connect){
   descriptor &= ~(TSD_OWN); //Apago el bit 13 TSD_OWN
   descriptor &= ~(0x3f << 16);  // 21-16 threshold en 0
   
-  while (!(__inportdw(tsd) & TSD_OWN))
+  while (!(sysInLong(tsd) & TSD_OWN))
     ;
 
-  __outportdw(tsd, descriptor);
+  sysOutLong(tsd, descriptor);
 
 }
 
@@ -570,48 +542,49 @@ void rtl_notify_connection(int connect){
 
 static int count = 0;
 void _debug_rtl_handler(){
-  __clear_screen();
-  uint16_t isr = __inportw(ISR);
+  ncClear();
+  uint16_t isr = sysInWord(ISR);
 
-  __outportw(ISR, 0x0);
-  __new_line();
-  __puts("Interrupting with ISR: "); __print_hex(isr);
-  __puts("  count: ");
-  __print_base(count++, 10);
-  __new_line();
+  sysOutWord(ISR, 0x0);
+  ncNewline();
+  ncPrint("Interrupting with ISR: "); ncPrintHex(isr);
+  ncPrint("  count: ");
+  ncPrintDec(count++);
+  ncNewline();
 
-  //__clear_screen(); 
-  __new_line();__new_line();__new_line();__new_line();__new_line();__new_line();__new_line();
+
+  ncClear(); 
+  ncNewline();ncNewline();ncNewline();ncNewline();ncNewline();ncNewline();ncNewline();
   int i;
-  __puts("ISR: "); __print_hex(isr); __new_line();
+  ncPrint("ISR: "); ncPrintHex(isr); ncNewline();
   if(isr & TRANSMIT_OK){ //Transmit OK
   
-    __puts("Transmitted ");
-    __print_base(transmission.size, 10);
-    __puts(" bytes.");
-    __new_line();
+    ncPrint("Transmitted ");
+    ncPrintDec(transmission.size);
+    ncPrint(" bytes.");
+    ncNewline();
 
-    __puts("Sent: ");
+    ncPrint("Sent: ");
     uint8_t * buf = ((uint8_t*)(&transmission.frame));
     for(i = 0; i < 30 ; i++){
-      __print_hex(buf[i]);
-      __puts(" ");
+      ncPrintHex(buf[i]);
+      ncPrint(" ");
     }
 
-    __new_line();
+    ncNewline();
 
   }
 
   if(isr & RECEIVE_OK){
-    __puts("Just recieved a package. It starts like this:");
+    ncPrint("Just recieved a package. It starts like this:");
 
     uint8_t * buf = ((uint8_t*)receiveBuffer);
     for(i = 0; i < 30 ; i++){
-      __print_hex(buf[i]);
-      __puts(" ");
+      ncPrintHex(buf[i]);
+      ncPrint(" ");
     }
 
-    __new_line();
+    ncNewline();
 
     rtl_save_msg(1, receiveBuffer + RX_DATA_OFFSET);
   }
@@ -621,18 +594,18 @@ void _debug_rtl_handler(){
 
 
 void rtlPrintMac(){
-  __puts("MAC: ");
-  __print_hex(__inportb(IOADDR));
-  __puts(":");
-  __print_hex(__inportb(IOADDR + 1));
-  __puts(":");
-  __print_hex(__inportb(IOADDR + 2));
-  __puts(":");
-  __print_hex(__inportb(IOADDR + 3));  
-  __puts(":");
-  __print_hex(__inportb(IOADDR + 4));  
-  __puts(":");
-  __print_hex(__inportb(IOADDR + 5));  
+  ncPrint("MAC: ");
+  ncPrintHex(sysInByte(IOADDR));
+  ncPrint(":");
+  ncPrintHex(sysInByte(IOADDR + 1));
+  ncPrint(":");
+  ncPrintHex(sysInByte(IOADDR + 2));
+  ncPrint(":");
+  ncPrintHex(sysInByte(IOADDR + 3));  
+  ncPrint(":");
+  ncPrintHex(sysInByte(IOADDR + 4));  
+  ncPrint(":");
+  ncPrintHex(sysInByte(IOADDR + 5));  
 }
 
 
@@ -640,33 +613,19 @@ void rtlPrintMac(){
 
 
 void printDetails(char* msg){
-  __new_line();
-  __puts(msg);
-  __puts("   TSD0: 0x");
-  __print_hex(__inportdw(TSD0));
-  __new_line();
-  __puts("TSD1: 0x");
-  __print_hex(__inportdw(TSD1));
-  __new_line();
-  __puts("TSD2: 0x");
-  __print_hex(__inportdw(TSD2));
-  __new_line();
-  __puts("TSD3: 0x");
-  __print_hex(__inportdw(TSD3));
-  __new_line();
+  ncNewline();
+  ncPrint(msg);
+  ncPrint("   TSD0: 0x");
+  ncPrintHex(sysInLong(TSD0));
+  ncNewline();
+  ncPrint("TSD1: 0x");
+  ncPrintHex(sysInLong(TSD1));
+  ncNewline();
+  ncPrint("TSD2: 0x");
+  ncPrintHex(sysInLong(TSD2));
+  ncNewline();
+  ncPrint("TSD3: 0x");
+  ncPrintHex(sysInLong(TSD3));
+  ncNewline();
 
 }
-
-void __print_rtl_status() {
-  uint16_t isr = __inportw(ioaddr + isr_reg);
-  __puts("TRANSMIT_OK: ");
-  __print_hex(isr & transmit_ok);
-  __puts("\nRECEIVE OK: ");
-  __print_hex(isr & receive_ok);
-  __puts("\n");
-  __puts("RECEIVE_TRANSMIT: ");
-  __print_hex(__inportb(ioaddr + cmd_reg));
-}
-
-
-#endif

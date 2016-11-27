@@ -1,3 +1,6 @@
+#define __ignore_code
+#ifndef __ignore_code
+
 #include <clock.h>
 
 
@@ -33,3 +36,5 @@ char * __system_time(char * str_time) {
 
 	return str_time;
 }
+
+#endif
