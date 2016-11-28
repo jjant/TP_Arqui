@@ -25,20 +25,21 @@ static struct program_s	programs[] = {
 	{"keyboard", shell_language},
 	{"help", shell_help},
 	{"echo", shell_echo},
+	{"send", shell_send},
+	{"hear", shell_hear},
 	{"", shell_null},
 	{"chat", shell_chat},
 	{NULL, shell_invalid_input}	// invalid input program determines the end of the programs array.
 };
 
 static uint8_t console_color = 4;
-/*
+
 int main() {
-	//shell_clean(NULL);
-	printf("Could access consoel\n");
+	shell_clean(NULL);
 	console_loop();
 
 	return 0;
-}*/
+}
 
 void console_loop() {
 	char command_history[HISTORY_SIZE][BUFFER_SIZE];
@@ -79,12 +80,12 @@ void console_loop() {
 }
 
 void print_shell_icon() {
-	/*uint8_t color = /*set_color(console_color)*/;
+	uint8_t color = set_color(console_color);
 	putchar(' ');
 	puts("Rama's PC ");
 	putchar(26);
 	putchar(' ');
-	/*set_color(color)*/;
+	set_color(color);
 }
 
 char ** parse_input(char * kb_buffer, char ** args) {
@@ -109,7 +110,7 @@ char ** parse_input(char * kb_buffer, char ** args) {
 	}
 
 	*current = '\0';
-	//args[k + 1][0] = '\0';
+	args[k + 1][0] = '\0';
 	return args;
 }
 
@@ -202,6 +203,52 @@ uint16_t shell_text(const char ** args) {
 	}
 	
 	putchar('\n');
+	return SHELL_OK;
+}
+
+uint16_t shell_send(const char ** args) {
+	if (args[1]) {
+		net_clear();
+		if (strcmp(args[1], "WHOAMI") == 0) {
+			printf("Sos el usuario: %d", net_id());
+			return SHELL_OK;
+		}	else if (strcmp(args[1], "ALL") == 0) {
+			net_broadcast(args[2]);
+			return SHELL_OK;
+		}
+
+		net_send(args[2], itoa(args[1]));
+		return SHELL_OK;
+	}
+
+	printf("Debe mandar los parametros adecuados");
+	return SHELL_OK;
+}
+
+uint16_t shell_hear(const char ** args) {
+	char buffer[1000];
+	typedef struct{
+	  int is_broadcast;
+	  int user;
+	  struct{
+	    char day;
+	    char month;
+	    char year;
+	    char hour;
+	    char min;
+	  } time;
+	} msg_desc;
+
+	msg_desc msg_info;
+
+  if(net_read(buffer, (uint64_t) &msg_info, 1000) == -1){
+    printf("\nNo hay mensajes nuevos :(\n");
+  }else{
+    do{
+	    printf("%s%d: %s", msg_info.is_broadcast ? "PUBLIC" : "PRIVATE", msg_info.user, buffer);
+    }while(net_read(buffer, (uint64_t) &msg_info, 1000) != -1);
+  }
+
 	return SHELL_OK;
 }
 

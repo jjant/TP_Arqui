@@ -1,9 +1,8 @@
-#define __ignore_code
-#ifndef __ignore_code
-
 #include <syscall.h>
 #include <interruptions.h>
 #include <stdint.h>
+#include <rtl.h>
+#include <rtc.h>
 #include <keyboard.h>
 #include <memory.h>
 #include <video.h>
@@ -11,6 +10,13 @@
 #define INTERRUPT_VECTOR	0x80
 #define SYSCALL_SIZE 256
 
+#define SYSCALL_GET_ID_NETWORK      16
+#define SYSCALL_DEVICE_NETWORK      15
+#define SYSCALL_GET_USERS_NETWORK   14
+#define SYSCALL_TOGGLE_CON_NETWORK  12
+#define SYSCALL_CLEAR_MESSAGE       10
+#define SYSCALL_READ_MESSAGE        9
+#define SYSCALL_SEND_MESSAGE        8
 #define SYSCALL_RESERVE_MEMORY      7
 #define SYSCALL_PRIVATE_LINE        6
 #define SYSCALL_KEYBOARD_LANGUAGE   5
@@ -32,13 +38,20 @@ void __initialize_syscall_vector() {
 }
 
 static void __setup_syscalls() {
-  syscall[SYSCALL_WRITE]             = __write;
-  syscall[SYSCALL_READ]              = __keyboard_key;
-  syscall[SYSCALL_CLEAN_SCREEN]      = __clear_screen;
-  syscall[SYSCALL_SET_COLOR]         = __set_color;
-  syscall[SYSCALL_KEYBOARD_LANGUAGE] = __change_keyboard;
-  syscall[SYSCALL_PRIVATE_LINE]      = __private_line;
-	syscall[SYSCALL_RESERVE_MEMORY]    = __malloc;
+  syscall[SYSCALL_WRITE]              = __write;
+  syscall[SYSCALL_READ]               = __keyboard_key;
+  syscall[SYSCALL_CLEAN_SCREEN]       = __clear_screen;
+  syscall[SYSCALL_SET_COLOR]          = __set_color;
+  syscall[SYSCALL_KEYBOARD_LANGUAGE]  = __change_keyboard;
+  syscall[SYSCALL_PRIVATE_LINE]       = __private_line;
+	syscall[SYSCALL_RESERVE_MEMORY]     = __malloc;
+  syscall[SYSCALL_GET_ID_NETWORK]     = rtl_get_id;
+  syscall[SYSCALL_GET_USERS_NETWORK]  = rtl_get_active_users;
+  syscall[SYSCALL_TOGGLE_CON_NETWORK] = rtl_notify_connection;
+  syscall[SYSCALL_CLEAR_MESSAGE]      = rtl_clear_msgs;
+  syscall[SYSCALL_READ_MESSAGE]       = rtl_next_msg;
+  syscall[SYSCALL_SEND_MESSAGE]       = rtl_send;
+
 }
 
 void __syscall_dispatcher(int id, uint64_t first_parameter, uint64_t second_parameter) {
@@ -55,6 +68,3 @@ void __write(char * str, size_t sz) {
 	for(i = 0; i < sz; i++)
 		__putc(str[i]);
 }
-
-
-#endif

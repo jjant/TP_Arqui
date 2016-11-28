@@ -17,12 +17,14 @@ typedef int (*EntryPoint)();
 
 int main() {
 
-	initInterruptions();
+	//initInterruptions();
 
 	//checkAllBuses(0, 1);
-	deviceDetails(0, 0x18);
+	//deviceDetails(0, 0x18);
 	//while(1);
-
+	__initialize_IDT();
+	__initialize_handlers();
+	__initialize_syscall_vector();
 	
 	//Inicializo la DMA y el RTL 
 	dma_init();

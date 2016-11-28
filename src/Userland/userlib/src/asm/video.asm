@@ -14,7 +14,7 @@ cls:
   ret
 
 set_color:
-  push rbp
+  push  rbp
   mov   rbp, rsp
 
   xor   rax, rax
@@ -28,7 +28,7 @@ set_color:
 
 
 private_line:
-  push rbp
+  push  rbp
   mov   rbp, rsp
 
   xor   rax, rax

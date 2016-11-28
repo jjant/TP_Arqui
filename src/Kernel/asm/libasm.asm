@@ -1,13 +1,13 @@
 GLOBAL cpuVendor
 GLOBAL sti
-GLOBAL setPicMaster
-GLOBAL setPicSlave
+GLOBAL __set_pic_master_asm
+GLOBAL __set_pic_slave_asm
 GLOBAL irq0Handler
 GLOBAL irq1Handler
 GLOBAL irq11Handler
 GLOBAL irq8Handler
 
-EXTERN irqDispatcher
+EXTERN __irq_dispatcher
 
 %include "./asm/macros.m"
 
@@ -29,7 +29,7 @@ sti:
 	sti
 	ret
 	
-setPicMaster:
+__set_pic_master_asm:
 	push rbp
 	mov rbp, rsp
 	
@@ -41,7 +41,7 @@ setPicMaster:
 	pop rbp
 	ret
 
-setPicSlave:
+__set_pic_slave_asm:
 	push    rbp
     mov     rbp, rsp
     mov     ax, di  ; en al esa la mascara

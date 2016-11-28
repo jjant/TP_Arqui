@@ -8,6 +8,8 @@ char * strcpy ( char * destination, char * source );
 char * strncpy ( char * destination, char * source, int size);
 int strchr(char * str, char c);
 int strncmp(char * s, char * t, unsigned int n);
+void reverse(char *);
+
 
 
 #endif

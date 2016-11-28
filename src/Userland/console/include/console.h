@@ -2,10 +2,13 @@
 #define CONSOLE_H
 
 #include <stdint.h>
-
+#include <network.h>
 
 #define NULL (void *)0
 #define MAX_ARGS		2
+#define SEND_CMD_OFFSET 2
+#define BCAST_CMD_OFFSET 2
+
 
 typedef uint16_t (* shell_program)(const char **);
 
@@ -25,6 +28,8 @@ uint16_t shell_invalid_input(const char **);
 uint16_t shell_quit(const char **);
 uint16_t shell_help(const char **);
 uint16_t shell_clean(const char **);
+uint16_t shell_hear(const char **);
+uint16_t shell_send(const char **);
 uint16_t shell_color(const char **);
 uint16_t shell_language(const char **);
 uint16_t shell_text(const char **);
