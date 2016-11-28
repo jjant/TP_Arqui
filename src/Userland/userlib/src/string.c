@@ -80,13 +80,12 @@ void reverse(char * s) {
   }
  }
 
- void putc(int c) {
+void putc(int c) {
   putc_asm(&c);
 }
 
 void puts(char * str) {
-  while(*str)
-    putc(*str++);
+  while(*str) putc(*str++);
 }
 
 uint8_t is_char(char c) {

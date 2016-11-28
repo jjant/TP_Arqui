@@ -30,8 +30,8 @@ int main() {
 	sti();
 
 	//Inicializo la DMA y el RTL 
-	dma_init();
-	findRTL();
+	__DMA_init();
+	//findRTL();
 	__net_init();
 
 	//rtlPrintMac();
@@ -50,7 +50,7 @@ int main() {
 	deviceDetails(0, 0x18);
 
 	initInterruptions();
-	dma_init();
+	__DMA_init();
 	findRTL();
 	rtl_init();
 	rtcInit();

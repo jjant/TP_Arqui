@@ -7,7 +7,6 @@ static struct {
   uint32_t size;
 } transmission;
 
-
 typedef struct{
   char present;
   struct{

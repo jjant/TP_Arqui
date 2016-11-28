@@ -225,22 +225,17 @@ uint16_t shell_hear(const char ** args) {
 	typedef struct{
 	  int is_broadcast;
 	  int user;
-	  struct{
-	    char day;
-	    char month;
-	    char year;
-	    char hour;
-	    char min;
-	  } time;
-	} msg_desc;
+	} message_meta_t;
 
-	msg_desc message_meta_t;
-  if(!net_read(buffer, (uint64_t) &message_meta_t, 1000)){
-    printf("\nNo hay mensajes nuevos :(\n");
+	message_meta_t message_info;
+  if(!net_read(buffer, (uint64_t) &message_info, 1000)){
+    printf(" El buzon esta vacio");
+    putc('\n');
   }else{
     do{
-	    printf("%s%d: %s", message_meta_t.is_broadcast ? "PUBLIC" : "PRIVATE", message_meta_t.user, buffer);
-    }while(net_read(buffer, (uint64_t) &message_meta_t, 1000));
+	    printf(" %s %d: %s", message_info.is_broadcast ? "PUBLIC" : "PRIVATE", message_info.user, buffer);
+			putc('\n');
+    } while(net_read(buffer, (uint64_t) &message_info, 1000));
   }
 
 	return SHELL_OK;
