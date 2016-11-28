@@ -49,14 +49,16 @@ void __net_init(){
   }
 }
 
-void __net_handler(){
+void __net_handler() {
   int i;
   uint16_t isr = sysInWord(ISR);
 
-  if(isr & RECEIVE_OK) {
+  if (isr & RECEIVE_OK) {
     uint8_t * frame = in_buffer + RX_HEADER_SIZE;
-    if(in_buffer[ORIGIN_USER_BYTE_OFFSET] >= 0 && in_buffer[ORIGIN_USER_BYTE_OFFSET] <=9)
-    __net_receive(__broadcasting(frame), in_buffer);
+//    uint8_t to_me = in_buffer[TO_USER_BYTE_OFFSET] == MAC[5];
+    uint8_t valid_mac = in_buffer[ORIGIN_USER_BYTE_OFFSET] >= 0 && in_buffer[ORIGIN_USER_BYTE_OFFSET] <= 9;
+
+    if (valid_mac) __net_receive(__broadcasting(frame), in_buffer);
   }
 
   __net_init();
@@ -68,7 +70,7 @@ static int __broadcasting(uint8_t * frame) {
   return 1;
 }
 
-static void __net_receive(int is_broadcast, char * frame){ 
+static void __net_receive(int is_broadcast, char * frame) { 
   if(message_buffer[current].present == TRUE) return;
 
   message_buffer[current].present = TRUE;

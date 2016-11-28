@@ -34,6 +34,7 @@
 #define RX_HEADER_SIZE 4
 #define RX_DATA_OFFSET (RX_HEADER_SIZE + ETH_HLEN) //Aca arranca la data posta en el frame ethernet 
 #define ORIGIN_USER_BYTE_OFFSET (RX_HEADER_SIZE + MAC_SIZE + MAC_SIZE - 1)
+#define TO_USER_BYTE_OFFSET (RX_HEADER_SIZE + MAC_SIZE - 1)
 
 void __net_init();
 void __net_handler();

@@ -14,8 +14,14 @@
 typedef uint16_t (* shell_program)(const char **);
 
 struct program_s {
-	const char *name;
+  const char *name;
   shell_program fnc;
+  const char *help;
+};
+
+struct color_s {
+  const char *name;
+  const uint8_t code;
 };
 
 void console_loop();
@@ -30,6 +36,7 @@ uint16_t shell_quit(const char **);
 uint16_t shell_help(const char **);
 uint16_t shell_clean(const char **);
 uint16_t shell_hear(const char **);
+uint16_t shell_placeholder(const char **);
 uint16_t shell_send(const char **);
 uint16_t shell_color(const char **);
 uint16_t shell_language(const char **);
