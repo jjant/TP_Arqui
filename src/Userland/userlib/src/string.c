@@ -5,6 +5,29 @@
 #include <string.h>
 #include <number.h>
 
+int atoi(const char *c) {
+    int value = 0;
+    int sign = 1;
+    if( *c == '+' || *c == '-' )
+    {
+        if( *c == '-' ) sign = -1;
+        c++;
+    }
+    while (isdigit(*c))
+    {
+        value *= 10;
+        value += (int) (*c-'0');
+        c++;
+    }
+    return (value * sign);
+}
+
+int isdigit(char c) {
+    if ((c>='0') && (c<='9')) 
+      return 1;
+    return 0;
+}
+
 //Devuelve la longitud de la cadena
 int strlen(char * s){
   int c = 0;
@@ -14,6 +37,7 @@ int strlen(char * s){
 
   return c;
 }
+
 
 
 //Compara 2 cadenas, devuelve 0 si son iguales

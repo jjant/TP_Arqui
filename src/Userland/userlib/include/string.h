@@ -13,7 +13,8 @@ void putc(int);
 void puts(char *);
 int strlen(char *);
 void printf(char *, ...);
-
+int atoi(const char *;);
+int isdigit(char);
 #endif
 
 

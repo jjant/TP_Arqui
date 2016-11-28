@@ -7,6 +7,8 @@ GLOBAL net_read
 GLOBAL net_users
 GLOBAL net_id
 
+; net_send(char * msg, int dst)
+;
 net_send:
   push  rbp
   mov   rbp, rsp
@@ -15,7 +17,7 @@ net_send:
   xor   rbx, rbx
   xor   rcx, rcx
   mov   rax, 8 ; syscall send message
-  mov   rbx, rdi
+  mov   rbx, rdi 
   mov   rcx, rsi
   int   80h
 

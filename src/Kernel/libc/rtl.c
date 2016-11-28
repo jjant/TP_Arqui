@@ -1,4 +1,5 @@
 #include <rtl.h>
+#include <string.h>
 
 static uint8_t MAC[6];
 
@@ -55,7 +56,6 @@ void __net_handler() {
 
   if (isr & RECEIVE_OK) {
     uint8_t * frame = in_buffer + RX_HEADER_SIZE;
-//    uint8_t to_me = in_buffer[TO_USER_BYTE_OFFSET] == MAC[5];
     uint8_t valid_mac = in_buffer[ORIGIN_USER_BYTE_OFFSET] >= 0 && in_buffer[ORIGIN_USER_BYTE_OFFSET] <= 9;
 
     if (valid_mac) __net_receive(__broadcasting(frame), in_buffer);
@@ -83,12 +83,19 @@ static void __net_receive(int is_broadcast, char * frame) {
 }
 
 int __net_read(char* buf, void * info, int max_size){
-  if(message_buffer[pointer].present == FALSE)return 0;
-
+  char dst_buf[5];
+  if(message_buffer[pointer].present == FALSE)
+    return 0;
+  // KILL MESSAGES THAT ARE FOR OTHER USERS
+  if(message_buffer[pointer].msg.data[0] != int_to_str(MAC[5], dst_buf)[0]) {
+    pointer++;
+    pointer %= MSG_BUF_SIZE;
+    return 0;
+  }
   // READ MESSAGE
   max_size = max_size < MAX_MSG_SIZE ? max_size : MAX_MSG_SIZE;
   char * next = message_buffer[pointer].msg.data;
-  strncpy(buf, next, MAX_MSG_SIZE);
+  strncpy(buf, next + 1, MAX_MSG_SIZE);
   message_buffer[pointer].present = FALSE;
 
   // LOAD MESSAGE
@@ -117,20 +124,27 @@ int __net_id() {
 
 void __net_send(char * msg, int dst){
   int i;
-
+  char send_msg[1000];
+  char dst_str[5];
   // SET DESTINATION MAC
   static unsigned char brdMAC[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
   unsigned char dstMAC[6] = { 0xBA, 0xDA, 0x55, 0xEE, 0x55, (unsigned char)dst };
   memcpy(transmission.frame.hdr.dst, dst < 0 ? brdMAC : dstMAC, 6);
 
+  // PREPARE MESSAGE
+  int_to_str(dst, dst_str);
+  strcpy(send_msg, dst_str); //Prepends dst to message
+  strcat(send_msg, msg);
+
   // PREPARE BUFFERS
   uint32_t tsd = TSD0;
   uint32_t tsad = TSAD0;
   transmission.frame.hdr.proto = ETH_P_802_3;
-  uint32_t descriptor = ETH_HLEN + strlen(msg);
+  uint32_t descriptor = ETH_HLEN + strlen(send_msg);
 
   // LOAD MESSAGE
-  memcpy(transmission.frame.data, msg, strlen(msg));
+
+  memcpy(transmission.frame.data, send_msg, strlen(send_msg));
 
   transmission.size = descriptor; 
   descriptor &= ~(TSD_OWN);

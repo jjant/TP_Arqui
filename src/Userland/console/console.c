@@ -225,7 +225,7 @@ uint16_t shell_send(const char ** args) {
 			return SHELL_OK;
 		}
 
-		net_send(args[2], itoa(args[1]));
+		net_send(args[2], atoi(args[1]));
 		return SHELL_OK;
 	}
 
