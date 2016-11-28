@@ -236,13 +236,12 @@ uint16_t shell_hear(const char ** args) {
 	} msg_desc;
 
 	msg_desc msg_info;
-
-  if(net_read(buffer, (uint64_t) &msg_info, 1000) == -1){
+  if(!net_read(buffer, (uint64_t) &msg_info, 1000)){
     printf("\nNo hay mensajes nuevos :(\n");
   }else{
     do{
 	    printf("%s%d: %s", msg_info.is_broadcast ? "PUBLIC" : "PRIVATE", msg_info.user, buffer);
-    }while(net_read(buffer, (uint64_t) &msg_info, 1000) != -1);
+    }while(net_read(buffer, (uint64_t) &msg_info, 1000));
   }
 
 	return SHELL_OK;

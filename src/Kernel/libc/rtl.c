@@ -245,7 +245,6 @@ void rtl_init(){
 void rtlHandler(){
   int i;
   uint16_t isr = sysInWord(ISR);
-
   if(isr & TRANSMIT_OK){ 
     //Transmit OK - No hay que hacer nada
   }
@@ -391,15 +390,16 @@ typedef struct{
 } msg_info;
 
 int rtl_next_msg(char* buf, void * info, int max_size){
-
+  puts("READ");
   if(message_buffer[pointer].present == FALSE){
-    return -1; //No hay nada todavia
+    return 0; //No hay nada todavia
   }
 
   max_size = max_size < MAX_MSG_SIZE ? max_size : MAX_MSG_SIZE; //Escribo como maximo min(max_size, MAX_MSG_SIZE)
 
   char * next = message_buffer[pointer].msg.data;
   strncpy(buf, next, MAX_MSG_SIZE);
+  puts(buf);
 
   message_buffer[pointer].present = FALSE; //Apago ese slot, ya lo lei
   
@@ -415,7 +415,7 @@ int rtl_next_msg(char* buf, void * info, int max_size){
   pointer++;            //Avanzo en el buffer
   pointer = pointer%MSG_BUF_SIZE;
 
-  return 0;
+  return 1;
   
 };
 
