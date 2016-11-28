@@ -205,6 +205,7 @@ uint16_t shell_text(const char ** args) {
 uint16_t shell_send(const char ** args) {
 	if (args[1]) {
 		net_clear();
+		net_connect();
 		if (strcmp(args[1], "WHOAMI") == 0) {
 			printf("Sos el usuario: %d", net_id());
 			return SHELL_OK;

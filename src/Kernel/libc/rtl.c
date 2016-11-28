@@ -4,6 +4,7 @@
 #include <rtc.h>
 #include <stdint.h>
 #include <string.h>
+#include <string.h>
 #include <naiveConsole.h>
 #include <ethernet.h>
 
@@ -245,13 +246,15 @@ void rtl_init(){
 void rtlHandler(){
   int i;
   uint16_t isr = sysInWord(ISR);
-  if(isr & TRANSMIT_OK){ 
+
+  if(isr & TRANSMIT_OK){
     //Transmit OK - No hay que hacer nada
   }
 
   if(isr & RECEIVE_OK){
     uint8_t * frame = receiveBuffer + RX_HEADER_SIZE;
-    if(checkMAC(frame))
+    rtl_save_msg(0, receiveBuffer);
+/*    if(checkMAC(frame))
     { 
       if(!is_connect(frame) && !is_disconnect(frame) && am_i_connected){
         int broadcasting = is_broadcast(frame);
@@ -276,7 +279,7 @@ void rtlHandler(){
         uint8_t userID = *(receiveBuffer + USER_BYTE_OFFSET);
         connected_users[userID] = 0;
       }
-    }
+    }*/
   }
 
   rtl_init(); //Reseteo el dispositivo porque si no no anda
@@ -361,7 +364,6 @@ static void rtl_save_msg(int is_broadcast, char * frame){
   /*ncPrint("Saving msg: "); ncPrint(msg);
   ncNewline();
   */strncpy(message_buffer[current].msg.data, frame + RX_DATA_OFFSET, MAX_MSG_SIZE);
-
   current++;
   current = current % MSG_BUF_SIZE; //Volver al principio si se pasa
 }
@@ -390,7 +392,6 @@ typedef struct{
 } msg_info;
 
 int rtl_next_msg(char* buf, void * info, int max_size){
-  puts("READ");
   if(message_buffer[pointer].present == FALSE){
     return 0; //No hay nada todavia
   }
@@ -399,7 +400,6 @@ int rtl_next_msg(char* buf, void * info, int max_size){
 
   char * next = message_buffer[pointer].msg.data;
   strncpy(buf, next, MAX_MSG_SIZE);
-  puts(buf);
 
   message_buffer[pointer].present = FALSE; //Apago ese slot, ya lo lei
   
@@ -470,7 +470,6 @@ int rtl_get_id(){
 
 */
 void rtl_send(char * msg, int dst){
-
   int i;
 
   if(dst < 0){ 
@@ -495,15 +494,13 @@ void rtl_send(char * msg, int dst){
   transmission.frame.hdr.proto = ETH_P_802_3; //Dummy type
 
   memcpy(transmission.frame.data, msg, strlen(msg));
-
-
+  
   uint32_t descriptor = ETH_HLEN + strlen(msg); //Bits 0-12: Size
   transmission.size = descriptor; 
   descriptor &= ~(TSD_OWN); //Apago el bit 13 TSD_OWN
   descriptor &= ~(0x3f << 16);  // 21-16 threshold en 0
   
-  while (!(sysInLong(tsd) & TSD_OWN))
-    ;
+  while (!(sysInLong(tsd) & TSD_OWN));
 
   sysOutLong(tsd, descriptor);
 }
