@@ -229,7 +229,9 @@ uint16_t shell_send(const char ** args) {
 		return SHELL_OK;
 	}
 
-	printf("Debe mandar los parametros adecuados");
+	printf(" Debe mandar los parametros adecuados");
+	putc('\n');
+
 	return SHELL_OK;
 }
 
