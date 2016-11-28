@@ -15,18 +15,18 @@
 #define ESC 0x01
 
 static struct program_s	programs[] = {
-	{"quit", shell_quit},
-	{"cls", shell_clean},
-	{"color", shell_color},
-	{"colorscheme", shell_colorscheme},
-	{"text", shell_text},
-	{"keyboard", shell_language},
-	{"help", shell_help},
-	{"echo", shell_echo},
-	{"send", shell_send},
-	{"hear", shell_hear},
+	{"QUIT", shell_quit},
+	{"CLS", shell_clean},
+	{"COLOR", shell_color},
+	{"COLORSCHEME", shell_colorscheme},
+	{"TEXT", shell_text},
+	{"KEYBOARD", shell_language},
+	{"HELP", shell_help},
+	{"ECHO", shell_echo},
+	{"SEND", shell_send},
+	{"HEAR", shell_hear},
+	{"CHAT", shell_chat},
 	{"", shell_null},
-	{"chat", shell_chat},
 	{NULL, shell_invalid_input}	// invalid input program determines the end of the programs array.
 };
 
@@ -87,7 +87,6 @@ void print_shell_icon() {
 }
 
 char ** parse_input(char * kb_buffer, char ** args) {
-
 	int k = 0;
 	char * current = args[0];
 	uint8_t in_string = 0;
@@ -250,19 +249,18 @@ uint16_t shell_hear(const char ** args) {
 }
 
 uint16_t shell_color(const char ** args) {
-	
-	if(strcmp(args[1], "ROJO") == 0) 					/*set_color(4)*/;
-	else if(strcmp(args[1], "AMARILLO") == 0) /*set_color(14)*/;
-	else if(strcmp(args[1], "LIMA") == 0) 		/*set_color(10)*/;
-	else if(strcmp(args[1], "TURQUESA") == 0) /*set_color(9)*/;
-	else if(strcmp(args[1], "GRIS") == 0) 		/*set_color(8)*/;
-	else if(strcmp(args[1], "BLANCO") == 0) 	/*set_color(7)*/;
-	else if(strcmp(args[1], "NARANJA") == 0) 	/*set_color(6)*/;
-	else if(strcmp(args[1], "FUCSIA") == 0) 	/*set_color(5)*/;
-	else if(strcmp(args[1], "CELESTE") == 0) 	/*set_color(3)*/;
-	else if(strcmp(args[1], "VERDE") == 0) 		/*set_color(2)*/;
-	else if(strcmp(args[1], "AZUL") == 0) 		/*set_color(1)*/;
-	else if(strcmp(args[1], "NEGRO") == 0) 		/*set_color(0)*/;
+	if(strcmp(args[1], "ROJO") == 0) 					set_color(4);
+	else if(strcmp(args[1], "AMARILLO") == 0) set_color(14);
+	else if(strcmp(args[1], "LIMA") == 0) 		set_color(10);
+	else if(strcmp(args[1], "TURQUESA") == 0) set_color(9);
+	else if(strcmp(args[1], "GRIS") == 0) 		set_color(8);
+	else if(strcmp(args[1], "BLANCO") == 0) 	set_color(7);
+	else if(strcmp(args[1], "NARANJA") == 0) 	set_color(6);
+	else if(strcmp(args[1], "FUCSIA") == 0) 	set_color(5);
+	else if(strcmp(args[1], "CELESTE") == 0) 	set_color(3);
+	else if(strcmp(args[1], "VERDE") == 0) 		set_color(2);
+	else if(strcmp(args[1], "AZUL") == 0) 		set_color(1);
+	else if(strcmp(args[1], "NEGRO") == 0) 		set_color(0);
 	else puts("Color no detectado. \n");
 
 	return SHELL_OK;
@@ -270,9 +268,9 @@ uint16_t shell_color(const char ** args) {
 
 uint16_t shell_colorscheme(const char ** args) {
 	
-	if(strcmp(args[1], "RIBER") == 0) { 			/*set_color(7)*/; console_color = 4; }
-	else if(strcmp(args[1], "BOCA") == 0) { 	/*set_color(1)*/; console_color = 14; }
-	else if(strcmp(args[1], "PATRIA") == 0) { /*set_color(3)*/; console_color = 7; }
+	if(strcmp(args[1], "RIBER") == 0) { 			set_color(7); console_color = 4; }
+	else if(strcmp(args[1], "BOCA") == 0) { 	set_color(1); console_color = 14; }
+	else if(strcmp(args[1], "PATRIA") == 0) { set_color(3); console_color = 7; }
 	else puts("Esquema de color no encontrado. \n");
 
 	return SHELL_OK;

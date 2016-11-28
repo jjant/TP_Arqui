@@ -14,7 +14,7 @@ getint(char mensaje[], ... )
   do  
   {
     va_start(ap, mensaje);
-    vprintf(mensaje, ap);
+    printf(mensaje, ap);
     va_end(ap);
 
     if ( scanf("%d",&n) != 1)

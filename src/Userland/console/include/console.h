@@ -6,7 +6,7 @@
 #include <network.h>
 
 #define NULL (void *)0
-#define MAX_ARGS		2
+#define MAX_ARGS		20
 #define SEND_CMD_OFFSET 2
 #define BCAST_CMD_OFFSET 2
 

@@ -12,8 +12,7 @@ void reverse(char *);
 void putc(int);
 void puts(char *);
 int strlen(char *);
-
-
+void printf(char *, ...);
 
 #endif
 

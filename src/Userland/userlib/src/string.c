@@ -1,5 +1,9 @@
-#include "string.h"
-
+#include <string.h>
+#include <stdint.h>
+#include <stdarg.h>
+#include <memory.h>
+#include <string.h>
+#include <number.h>
 
 //Devuelve la longitud de la cadena
 int strlen(char * s){
@@ -85,24 +89,60 @@ void puts(char * str) {
     putc(*str++);
 }
 
+uint8_t is_char(char c) {
+  return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == ' ' || c >= 0 && c <= 9;
+}
 
-///below is our code
-#define __ignore_code
-#ifndef __ignore_code
-
-#include <stdint.h>
-#include <stdarg.h>
-#include <memory.h>
-#include <string.h>
-#include <number.h>
-
-static void putc_asm(int *);
 void putint(int value) {
   void * aux = malloc(MAX_INT_LENGTH);
   char * str = (char *) aux;
   itoa(value, str);
   puts(str);
 }
+
+void printf(char * str, ...) {
+  int i = 0;
+  char * string_value;
+
+  va_list args;
+  va_start(args, str);
+
+  while (str[i] != '\0') {
+    char next_char = str[i + 1];
+    
+    if (is_char(str[i])) putc(str[i]);
+    else if (str[i] == '\\') putc(next_char == 'n' ? '\n' : '\\'); 
+    else if (str[i] == '%') {
+      if (next_char != 'c' && next_char != 'd' && next_char != 's') {
+        putc(str[i++]);
+        continue;
+      }
+
+      switch (next_char) {
+      case 'd': putint(va_arg(args, int)); break;
+      case 'c': putc(va_arg(args, int)); break;
+      case 's':
+        string_value = va_arg(args, char *);
+        for (int j = 0; string_value[j] != '\0'; j++) {
+          putc(string_value[j]);
+        }
+        break;
+      }
+      i++;
+    }
+    i++;
+  }
+
+  va_end(args);
+}
+
+
+///below is our code
+#define __ignore_code
+#ifndef __ignore_code
+
+
+
 
 void reverse(char * s) {
   int i, j;
@@ -134,46 +174,6 @@ int strcmp(const char * str1, const char * str2) {
 
 void break_line() {
 	putc('\n');
-}
-
-uint8_t is_char(char c) {
-  return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
-}
-
-void printf(char * str, ...) {
-  int i = 0;
-  char * string_value;
-
-  va_list args;
-  va_start(args, str);
-
-  while (str[i] != '\0') {
-    char next_char = str[i + 1];
-    
-    if (is_char(str[i])) putc(str[i]);
-    else if (str[i] == '\\') putc(next_char == 'n' ? '\n' : '\\'); 
-    else if (str[i] == '%') {
-      if (next_char != 'c' && next_char != 'd' && next_char != 's') {
-        putc(str[i++]);
-        continue;
-      }
-
-      switch (next_char) {
-      case 'd': putint(va_arg(args, int)); break;
-      case 'c': putc(va_arg(args, char)); break;
-      case 's':
-        string_value = va_arg(args, char *);
-        for (int j = 0; string_value[j] != '\0'; j++) {
-          putc(string_value[j]);
-        }
-        break;
-      }
-      i++;
-    }
-    i++;
-  }
-
-  va_end(args);
 }
 
 #endif
