@@ -32,8 +32,7 @@ int main() {
 	//Inicializo la DMA y el RTL 
 	dma_init();
 	findRTL();
-	rtl_init();
-	rtcInit();
+	__net_init();
 
 	//rtlPrintMac();
 

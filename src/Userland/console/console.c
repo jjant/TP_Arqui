@@ -25,7 +25,6 @@ static struct program_s	programs[] = {
 	{"ECHO", shell_echo},
 	{"SEND", shell_send},
 	{"HEAR", shell_hear},
-	{"CHAT", shell_chat},
 	{"", shell_null},
 	{NULL, shell_invalid_input}	// invalid input program determines the end of the programs array.
 };
@@ -205,7 +204,6 @@ uint16_t shell_text(const char ** args) {
 uint16_t shell_send(const char ** args) {
 	if (args[1]) {
 		net_clear();
-		net_connect();
 		if (strcmp(args[1], "WHOAMI") == 0) {
 			printf("Sos el usuario: %d", net_id());
 			return SHELL_OK;
@@ -236,13 +234,13 @@ uint16_t shell_hear(const char ** args) {
 	  } time;
 	} msg_desc;
 
-	msg_desc msg_info;
-  if(!net_read(buffer, (uint64_t) &msg_info, 1000)){
+	msg_desc message_meta_t;
+  if(!net_read(buffer, (uint64_t) &message_meta_t, 1000)){
     printf("\nNo hay mensajes nuevos :(\n");
   }else{
     do{
-	    printf("%s%d: %s", msg_info.is_broadcast ? "PUBLIC" : "PRIVATE", msg_info.user, buffer);
-    }while(net_read(buffer, (uint64_t) &msg_info, 1000));
+	    printf("%s%d: %s", message_meta_t.is_broadcast ? "PUBLIC" : "PRIVATE", message_meta_t.user, buffer);
+    }while(net_read(buffer, (uint64_t) &message_meta_t, 1000));
   }
 
 	return SHELL_OK;
@@ -292,11 +290,6 @@ uint16_t shell_language(const char ** args) {
 }
 
 uint16_t shell_null(const char ** args) {
-	return SHELL_OK;
-}
-
-uint16_t shell_chat(const char ** args) {
-	chat();
 	return SHELL_OK;
 }
 

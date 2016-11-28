@@ -2,7 +2,6 @@
 #include <interruptions.h>
 #include <stdint.h>
 #include <rtl.h>
-#include <rtc.h>
 #include <keyboard.h>
 #include <memory.h>
 #include <video.h>
@@ -45,13 +44,10 @@ static void __setup_syscalls() {
   syscall[SYSCALL_KEYBOARD_LANGUAGE]  = __change_keyboard;
   syscall[SYSCALL_PRIVATE_LINE]       = __private_line;
 	syscall[SYSCALL_RESERVE_MEMORY]     = __malloc;
-  syscall[SYSCALL_GET_ID_NETWORK]     = rtl_get_id;
-  syscall[SYSCALL_GET_USERS_NETWORK]  = rtl_get_active_users;
-  syscall[SYSCALL_TOGGLE_CON_NETWORK] = rtl_notify_connection;
-  syscall[SYSCALL_CLEAR_MESSAGE]      = rtl_clear_msgs;
-  syscall[SYSCALL_READ_MESSAGE]       = rtl_next_msg;
-  syscall[SYSCALL_SEND_MESSAGE]       = rtl_send;
-
+  syscall[SYSCALL_GET_ID_NETWORK]     = __net_id;
+  syscall[SYSCALL_CLEAR_MESSAGE]      = __net_clear;
+  syscall[SYSCALL_READ_MESSAGE]       = __net_read;
+  syscall[SYSCALL_SEND_MESSAGE]       = __net_send;
 }
 
 void __syscall_dispatcher(int id, uint64_t first_parameter, uint64_t second_parameter) {
