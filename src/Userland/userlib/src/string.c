@@ -76,6 +76,15 @@ void reverse(char * s) {
   }
  }
 
+ void putc(int c) {
+  putc_asm(&c);
+}
+
+void puts(char * str) {
+  while(*str)
+    putc(*str++);
+}
+
 
 ///below is our code
 #define __ignore_code
@@ -88,16 +97,6 @@ void reverse(char * s) {
 #include <number.h>
 
 static void putc_asm(int *);
-
-void putc(int c) {
-	putc_asm(&c);
-}
-
-void puts(char * str) {
-	while(*str)
-		putc(*str++);
-}
-
 void putint(int value) {
   void * aux = malloc(MAX_INT_LENGTH);
   char * str = (char *) aux;

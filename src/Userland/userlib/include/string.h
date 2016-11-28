@@ -9,6 +9,9 @@ char * strncpy ( char * destination, char * source, int size);
 int strchr(char * str, char c);
 int strncmp(char * s, char * t, unsigned int n);
 void reverse(char *);
+void putc(int);
+void puts(char *);
+int strlen(char *);
 
 
 
@@ -21,9 +24,6 @@ void reverse(char *);
 #ifndef STRING_H
 #define STRING_H
 
-void putc(int);
-void puts(char *);
-int strlen(char *);
 void reverse(char *);
 int strcmp(const char *, const char *);
 

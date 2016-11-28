@@ -25,14 +25,17 @@ int main() {
 	__initialize_IDT();
 	__initialize_handlers();
 	__initialize_syscall_vector();
-	
+	__set_pic_master_asm(0x00);
+	__set_pic_slave_asm(0x0);
+	sti();
+
 	//Inicializo la DMA y el RTL 
 	dma_init();
 	findRTL();
 	rtl_init();
 	rtcInit();
 
-	rtlPrintMac();
+	//rtlPrintMac();
 
 	((EntryPoint)(0x400000))();
 

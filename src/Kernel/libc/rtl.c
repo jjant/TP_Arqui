@@ -226,8 +226,6 @@ void rtl_init(){
 
 
   currentDescriptor = 0;
-
-  ncPrint("Initialized rtl");
 }
 
 

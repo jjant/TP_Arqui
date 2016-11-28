@@ -43,11 +43,11 @@ __set_pic_master_asm:
 
 __set_pic_slave_asm:
 	push    rbp
-    mov     rbp, rsp
-    mov     ax, di  ; en al esa la mascara
-    out	    0A1h, al
-    pop     rbp
-    retn
+  mov     rbp, rsp
+  mov     ax, di  ; en al esa la mascara
+  out	    0A1h, al
+  pop     rbp
+  ret
 
 cpuVendor:
 	push rbp

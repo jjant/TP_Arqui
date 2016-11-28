@@ -2,8 +2,6 @@
 #include <string.h>
 #include <stdint.h>
 #include <memory.h>
-//#include <stdio.h>
-//#include <syscalls.h>
 
 #define BUFFER_SIZE 128
 #define HISTORY_SIZE 20
@@ -62,11 +60,11 @@ void console_loop() {
 		while((c = getchar()) != '\n') {
 			if(c == BACKSPACE) {
 				if (!current_index) continue;
-				putchar(BACKSPACE);
+				putc(BACKSPACE);
 				command[--current_index] = 0;
 			}
 			else if (c == ESC) set_keyboard_language(0);
-			else if (c) putchar(command[current_index++] = c);
+			else if (c) putc(command[current_index++] = c);
 		}
 
 		parse_input(command, args);
@@ -81,10 +79,10 @@ void console_loop() {
 
 void print_shell_icon() {
 	uint8_t color = set_color(console_color);
-	putchar(' ');
+	putc(' ');
 	puts("Rama's PC ");
-	putchar(26);
-	putchar(' ');
+	putc(26);
+	putc(' ');
 	set_color(color);
 }
 
@@ -119,7 +117,7 @@ uint16_t execute_program(struct program_s * programs, char ** args) {
 	struct program_s current = programs[i];
 	uint16_t ret_val;
 
-	putchar('\n');
+	putc('\n');
 
   while(current.name) {
   	if(strcmp(current.name, args[0]) == 0) {
@@ -132,31 +130,30 @@ uint16_t execute_program(struct program_s * programs, char ** args) {
 	}
 	ret_val = current.fnc(args);
 
-	clean_up:	//putchar('\n');
+	clean_up:	//putc('\n');
 	return ret_val;
 }
 
 uint16_t shell_invalid_input(const char ** args) {
 	puts(" Invalid input detected.");
-	putchar('\n');
+	putc('\n');
 	return SHELL_OK;
 }
 
 uint16_t shell_quit(const char ** args) {
 	puts(args[1]);
 	puts(" Quitting shell.");
-	putchar('\n');
+	putc('\n');
 	return SHELL_QUIT;
 }
 
 uint16_t shell_echo(const char ** args) {
 	puts(" Este es el program help.");
-	putchar('\n');
+	putc('\n');
 	return SHELL_OK;
 }
 
 uint16_t shell_help(const char ** args) {
-	
 	if (strcmp(args[1], "HELP") == 0) {
 		puts("Recurrencia, recursion o recursividad es la forma en la cual se especifica un proceso basado en su propia definicion\n");
 	} else if (strcmp(args[1], "COLOR") == 0) {
@@ -193,16 +190,16 @@ uint16_t shell_help(const char ** args) {
 
 uint16_t shell_text(const char ** args) {
 	char c;
-	sys_clrscrn();
+	cls();
 	
 	while(1) {
 		c = getchar();
-		if(c == BACKSPACE) putchar(BACKSPACE);
+		if(c == BACKSPACE) putc(BACKSPACE);
 		else if (c == ESC) break;
-		else if (c) putchar(c);
+		else if (c) putc(c);
 	}
 	
-	putchar('\n');
+	putc('\n');
 	return SHELL_OK;
 }
 
@@ -282,7 +279,7 @@ uint16_t shell_colorscheme(const char ** args) {
 }
 
 uint16_t shell_clean(const char ** args) {
-	sys_clrscrn();
+	cls();
 	return SHELL_OK;
 }
 

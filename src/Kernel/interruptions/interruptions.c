@@ -1,4 +1,3 @@
-
 #include <interruptions.h>
 #include <handler.h>
 
@@ -31,16 +30,8 @@ void __IDT_add_handler(int index, uint64_t handler) {
 	IDT[index].zero_h = 0;	
 }
 
-void setPIC(){
-	__set_pic_master_asm(0x00);
-	__set_pic_slave_asm(0x0);
-}
-
 void __initialize_IDT() {
 	__IDT_add_handler(0x20, (uint64_t) irq0Handler);
 	__IDT_add_handler(0x21, (uint64_t) irq1Handler);
 	__IDT_add_handler(0x2B, (uint64_t) irq11Handler);
-
-	setPIC();
-	sti();
 }

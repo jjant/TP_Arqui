@@ -2,6 +2,7 @@
 #define CONSOLE_H
 
 #include <stdint.h>
+#include <keyboard.h>
 #include <network.h>
 
 #define NULL (void *)0

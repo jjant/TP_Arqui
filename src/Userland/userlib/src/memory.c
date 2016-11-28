@@ -1,6 +1,3 @@
-#define __ignore_code
-#ifndef __ignore_code
-
 #include <memory.h>
 
 void * malloc(unsigned int size) {
@@ -14,5 +11,3 @@ void * calloc(unsigned int size) {
 void free() {
   return;
 }
-
-#endif
