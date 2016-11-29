@@ -143,7 +143,6 @@ uint16_t shell_invalid_input(char ** const args) {
 }
 
 uint16_t shell_quit(char ** const args) {
-	puts(args[1]);
 	puts(" Quitting shell.");
 	putc('\n');
 	return SHELL_QUIT;
@@ -155,7 +154,7 @@ uint16_t shell_placeholder(char ** const args) {
 }
 
 uint16_t shell_echo(char ** const args) {
-	puts(" Este es el program help.");
+  if (args[1]) printf(" %s", args[1]);
 	putc('\n');
 	return SHELL_OK;
 }
