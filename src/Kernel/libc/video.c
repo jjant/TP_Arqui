@@ -6,7 +6,7 @@
 #define RED_COLOR 4
 
 static uint32_t __uint_to_base(uint64_t, char *, uint32_t);
-static void private_line_paint();
+static void __private_line_paint();
 
 static uint8_t * const private_video = (uint8_t *) (0xB8000);
 static uint8_t * const video = (uint8_t *) (0xB8000 + 80 * 4);
@@ -31,8 +31,8 @@ void __clear_line(int line) {
 	}
 }
 
-static void private_line_paint() {
-	// Color private line
+// Color private line
+static void __private_line_paint() {
 	int i;
 	for (i = 1; i < width * 2; i += 2) {
 		private_video[i] = current_color << 4;
@@ -48,7 +48,7 @@ void __private_line(char * str) {
 		private_video[i] = ' ';
 	}
 
-	private_line_paint();
+	__private_line_paint();
 
 	// Copy text
 	i = 0;
@@ -78,7 +78,7 @@ void __scroll() {
 uint8_t __set_color(uint8_t color) {
 	uint8_t color_aux = current_color;
 	current_color = color;
-	private_line_paint();
+	__private_line_paint();
 	return color_aux; 
 }
 

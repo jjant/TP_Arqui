@@ -1,8 +1,5 @@
-#define __ignore_code
-#ifndef __ignore_code
-
 #include <clock.h>
-
+#include <string.h>
 
 int __system_seconds() {
 	return __system_seconds_asm();
@@ -36,5 +33,3 @@ char * __system_time(char * str_time) {
 
 	return str_time;
 }
-
-#endif

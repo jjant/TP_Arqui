@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-void sti();
+void __sti();
 
 void irq0Handler();
 void irq1Handler();

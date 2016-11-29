@@ -28,28 +28,6 @@ int isdigit(char c) {
     return 0;
 }
 
-//Devuelve la longitud de la cadena
-int strlen(char * s){
-  int c = 0;
-  while(*(s++) != 0){
-    c++;
-  }
-
-  return c;
-}
-
-
-
-//Compara 2 cadenas, devuelve 0 si son iguales
-int strcmp(char * s1, char * s2){
-  while(*s1 && *s2 && *s1 == *s2){
-    s1++;
-    s2++;
-  }
-  return *s1 - *s2;
-}
-
-
 int strncmp(char * s, char * t, unsigned int n) {
   int i;
   for (i = 0; i < n-1 && s[i] != '\0' && t[i] != '\0' && s[i] == t[i]; i++)
@@ -92,17 +70,6 @@ int strchr(char*str, char c){
   }
   return 0;
 }
-
-void reverse(char * s) {
-  int i, j;
-  char c;
-
-  for (i = 0, j = strlen(s) - 1; i < j; i++, j--) {
-    c = s[i];
-    s[i] = s[j];
-    s[j] = c;
-  }
- }
 
 void putc(int c) {
   putc_asm(&c);
@@ -159,14 +126,6 @@ void printf(char * str, ...) {
   va_end(args);
 }
 
-
-///below is our code
-#define __ignore_code
-#ifndef __ignore_code
-
-
-
-
 void reverse(char * s) {
   int i, j;
   char c;
@@ -198,5 +157,3 @@ int strcmp(const char * str1, const char * str2) {
 void break_line() {
 	putc('\n');
 }
-
-#endif

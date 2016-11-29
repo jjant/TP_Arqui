@@ -45,6 +45,7 @@ uint16_t shell_colorscheme(const char **);
 uint16_t shell_null(const char **);
 uint16_t shell_echo(const char **);
 uint16_t shell_chat(const char **);
+uint16_t shell_beatles(const char **);
 void clean_buffer(char *, uint16_t);
 
 #endif

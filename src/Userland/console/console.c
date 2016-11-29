@@ -26,6 +26,7 @@ static struct program_s	programs[] = {
   {"HELP",        shell_help, "Recurrencia, recursion o recursividad es la forma en la cual se especifica un proceso basado en su propia definicion"},
   {"ECHO",        shell_echo, "Los mensajes deben ir entre comillas simples 'MENSAJE'"},
   {"PLACEHOLDER", shell_placeholder, "Manda el placeholder nuevo por argumento"},
+  {"BEATLES",     shell_beatles, "Conoce un poco de los Beatles"},
   {"",            shell_null, ""},
   {NULL,          shell_invalid_input, ""}
 };
@@ -160,12 +161,6 @@ uint16_t shell_echo(const char ** args) {
 }
 
 uint16_t shell_help(const char ** args) {
-  
-  if (strcmp(args[1], "BEATLES") == 0) {
-    puts(" Help! I need somebody\n");puts(" Help! not just anybody\n");puts(" Help! you know i need someone\n");puts(" Help! when i was younger, so much younger than today\n");puts(" I never needed anybody's help in any way\n");puts(" But now these days are gone i'm not so self assured\n");puts(" Now i findi've changed my mind, i've opened up the doors\n");puts(" Help me if you can, i'm feeling down\n");puts(" And i do appreciate you being 'round\n");puts(" Help me get my feet back on the ground\n");puts(" Won't you please, please help me?\n");puts(" And now my life has changed in oh so many ways\n");puts(" My independence seems to vanish in the haze\n");puts(" But every now and then i feel so insecure\n");puts(" I know that i just need you like i've never done before\n");
-    return SHELL_OK;
-  }
-
   int i = -1;
   while(programs[++i].name) {
     if (strcmp(programs[i].name, args[1]) == 0) {
@@ -248,8 +243,10 @@ uint16_t shell_hear(const char ** args) {
     putc('\n');
   }else{
     do{
-	    printf(" %s %d: %s", message_info.is_broadcast ? "PUBLIC" : "PRIVATE", message_info.user, buffer);
-			putc('\n');
+      if(*buffer != 0) {
+  	    printf(" %s %d: %s", message_info.is_broadcast ? "PUBLIC" : "PRIVATE", message_info.user, buffer);
+  			putc('\n');
+      }
     } while(net_read(buffer, (uint64_t) &message_info, 1000));
   }
 
@@ -315,6 +312,26 @@ uint16_t shell_language(const char ** args) {
 
 uint16_t shell_null(const char ** args) {
 	return SHELL_OK;
+}
+
+uint16_t shell_beatles(const char ** args) {
+  puts(" Help! I need somebody\n");
+  puts(" Help! not just anybody\n");
+  puts(" Help! you know i need someone\n");
+  puts(" Help! when i was younger, so much younger than today\n");
+  puts(" I never needed anybody's help in any way\n");
+  puts(" But now these days are gone i'm not so self assured\n");
+  puts(" Now i findi've changed my mind, i've opened up the doors\n");
+  puts(" Help me if you can, i'm feeling down\n");
+  puts(" And i do appreciate you being 'round\n");
+  puts(" Help me get my feet back on the ground\n");
+  puts(" Won't you please, please help me?\n");
+  puts(" And now my life has changed in oh so many ways\n");
+  puts(" My independence seems to vanish in the haze\n");
+  puts(" But every now and then i feel so insecure\n");
+  puts(" I know that i just need you like i've never done before\n");
+
+  return SHELL_OK;
 }
 
 void clean_buffer(char * kb_buffer, uint16_t size) {

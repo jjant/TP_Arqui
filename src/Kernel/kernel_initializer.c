@@ -37,37 +37,14 @@ void * getStackBase()
 
 void * __initialize_kernel_binary()
 {
-	__puts("[Loading modules]");
-	__new_line();
+	__puts("[Loading modules]\n");
 	void * moduleAddresses[] = {
 		console_module_address
 	};
 	loadModules(&endOfKernelBinary, moduleAddresses);
-	__puts("[Done]");
-	__new_line();
-	__new_line();
-
-	__puts("[Initializing kernel's binary]");
-	__new_line();
+	__puts("[Done]\n");
+	__puts("[Initializing kernel's binary]\n");
 
 	clearBSS(&bss, &endOfKernel - &bss);
-/*
-	ncPrint("  text: 0x");
-	ncPrintHex((uint64_t)&text);
-	ncNewline();
-	ncPrint("  rodata: 0x");
-	ncPrintHex((uint64_t)&rodata);
-	ncNewline();
-	ncPrint("  data: 0x");
-	ncPrintHex((uint64_t)&data);
-	ncNewline();
-	ncPrint("  bss: 0x");
-	ncPrintHex((uint64_t)&bss);
-	ncNewline();
-
-	ncPrint("[Done]");
-	ncNewline();
-*/
-
 	return getStackBase();
 }

@@ -1,5 +1,5 @@
 GLOBAL cpuVendor
-GLOBAL sti
+GLOBAL __sti
 GLOBAL __set_pic_master_asm
 GLOBAL __set_pic_slave_asm
 GLOBAL irq0Handler
@@ -25,7 +25,7 @@ irq8Handler:
 irq11Handler:
 	irqSlaveHandler 11
 
-sti:
+__sti:
 	sti
 	ret
 	

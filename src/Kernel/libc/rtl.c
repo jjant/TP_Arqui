@@ -1,4 +1,5 @@
 #include <rtl.h>
+#include <ports.h>
 #include <string.h>
 
 static uint8_t MAC[6];
@@ -8,16 +9,16 @@ static struct {
   uint32_t size;
 } transmission;
 
-typedef struct{
+typedef struct {
   char present;
-  struct{
+  struct {
     char broadcast;
     char user;
     char data[MAX_MSG_SIZE + 1];
   } msg;
 } message_t;
 
-typedef struct{
+typedef struct {
   int broadcast;
   int user;
 } message_meta_t;
@@ -34,25 +35,25 @@ static int __broadcasting(uint8_t *);
 void __net_init(){
   int i;
 
-  sysOutByte( IOADDR + 0x52, 0x0); // POWER
-  sysOutByte( IOADDR + 0x37, 0x10); // RESET
-  while( (sysInByte(IOADDR + 0x37) & 0x10) != 0); // CLEAN 
-  sysOutLong(IOADDR + 0x30, (uint32_t)in_buffer); // BUFFER IN
-  sysOutWord(IOADDR + 0x3C, 0x000f); // TRANSMIT_OK & RECEIVE_OK SETUP
-  sysOutLong(IOADDR + 0x44, 0xf | (1 << 7)); // PACKAGES CLASSES SETUP
-  sysOutByte(IOADDR + 0x37, 0x0C); // ENABLE TO TRANSMIT AND RECEIVE
-  sysOutLong(TSAD0, (uint32_t)&transmission.frame); // SETUP BUFFER
+  __outportb( IOADDR + 0x52, 0x0); // POWER
+  __outportb( IOADDR + 0x37, 0x10); // RESET
+  while( (__inportb(IOADDR + 0x37) & 0x10) != 0); // CLEAN 
+  __outportdw(IOADDR + 0x30, (uint32_t)in_buffer); // BUFFER IN
+  __outportw(IOADDR + 0x3C, 0x000f); // TRANSMIT_OK & RECEIVE_OK SETUP
+  __outportdw(IOADDR + 0x44, 0xf | (1 << 7)); // PACKAGES CLASSES SETUP
+  __outportb(IOADDR + 0x37, 0x0C); // ENABLE TO TRANSMIT AND RECEIVE
+  __outportdw(TSAD0, (uint32_t)&transmission.frame); // SETUP BUFFER
 
   // MAC SETUP
   for(i = 0; i < MAC_SIZE ; i++){
-    transmission.frame.hdr.src[i] = sysInByte(IOADDR + i);
-    MAC[i] = sysInByte(IOADDR + i);
+    transmission.frame.hdr.src[i] = __inportb(IOADDR + i);
+    MAC[i] = __inportb(IOADDR + i);
   }
 }
 
 void __net_handler() {
   int i;
-  uint16_t isr = sysInWord(ISR);
+  uint16_t isr = __inportw(ISR);
 
   if (isr & RECEIVE_OK) {
     uint8_t * frame = in_buffer + RX_HEADER_SIZE;
@@ -87,10 +88,11 @@ int __net_read(char* buf, void * info, int max_size){
   if(message_buffer[pointer].present == FALSE)
     return 0;
   // KILL MESSAGES THAT ARE FOR OTHER USERS
-  if(message_buffer[pointer].msg.data[0] != int_to_str(MAC[5], dst_buf)[0]) {
+  if( !message_buffer[pointer].msg.broadcast && message_buffer[pointer].msg.data[0] != int_to_str(MAC[5], dst_buf)[0]) {
+    *buf = 0;
     pointer++;
     pointer %= MSG_BUF_SIZE;
-    return 0;
+    return 1;
   }
   // READ MESSAGE
   max_size = max_size < MAX_MSG_SIZE ? max_size : MAX_MSG_SIZE;
@@ -151,6 +153,6 @@ void __net_send(char * msg, int dst){
   descriptor &= ~(0x3f << 16);
 
   // SEND  
-  while (!(sysInLong(tsd) & TSD_OWN));
-  sysOutLong(tsd, descriptor);
+  while (!(__inportdw(tsd) & TSD_OWN));
+  __outportdw(tsd, descriptor);
 }
