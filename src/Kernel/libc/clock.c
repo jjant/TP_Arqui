@@ -1,5 +1,5 @@
 #include <clock.h>
-
+#include <string.h>
 
 int __system_seconds() {
 	return __system_seconds_asm();
