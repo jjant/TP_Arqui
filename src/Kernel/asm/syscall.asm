@@ -12,3 +12,4 @@ __syscall_handler:
 	call	__syscall_dispatcher
 	popaq
 	iretq
+

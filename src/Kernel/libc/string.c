@@ -1,8 +1,84 @@
 #include <string.h>
+#include <stdarg.h>
 
 /* Maybe these should go in userland section, as they don't system memory/stuff.
 ** I don't know.
 */
+void printf(char * str, ...) {
+  int i = 0;
+  char * string_value;
+
+  va_list args;
+  va_start(args, str);
+
+  while (str[i] != '\0') {
+    char next_char = str[i + 1];
+    
+    if (is_char(str[i])) __putc(str[i]);
+    else if (str[i] == '\\') __putc(next_char == 'n' ? '\n' : '\\'); 
+    else if (str[i] == '%') {
+      if (next_char != 'c' && next_char != 'd' && next_char != 's') {
+        __putc(str[i++]);
+        continue;
+      }
+
+      switch (next_char) {
+      case 'd': putint(va_arg(args, int)); break;
+      case 'c': __putc(va_arg(args, int)); break;
+      case 's':
+        string_value = va_arg(args, char *);
+        for (int j = 0; string_value[j] != '\0'; j++) {
+          __putc(string_value[j]);
+        }
+        break;
+      }
+      i++;
+    }
+    i++;
+  }
+
+  va_end(args);
+}
+
+void putint(int value) {
+  void * aux = __malloc(30);
+  char * str = (char *) aux;
+  itoa(value, str);
+  __puts(str);
+}
+
+uint8_t is_char(char c) {
+  return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == ' ' || c >= 0 && c <= 9;
+}
+
+void itoa(int n, char * s) {
+  int i, sign = n;
+  i = 0;
+  char buf[100];
+  strcpy(buf, s);
+
+  if (sign < 0) n = -n;
+  do {
+    s[i++] = n % 10 + '0';
+  } while ((n /= 10) > 0);
+
+  if (sign < 0) s[i++] = '-';
+  s[i] = '\0';
+
+  str_reverse(s, buf);
+}
+
+
+char * strncpy(char * dest, char * src, int size){
+	int i = 0;
+	char * ret = dest;
+	while(*src && i < size){
+		*(dest++) = *(src++);
+		i++;
+	}
+	*dest = '\0';
+	return ret;
+}
 
 char * strcpy(char * dest, const char * src) {
 	dest[0] = '\0';
@@ -24,7 +100,7 @@ char * strcat(char * str1, const char * str2) {
 
 int strlen(const char * str) {
 	const char * s;
-	for(s = str; *str; str++);
+	for(s = str; *s; s++);
 
 	return s - str;
 }
@@ -50,6 +126,16 @@ char * str_reverse(char * dest, const char * src) {
 	return ret;
 }
 
+/* Returns zero if str doesn't contain 
+** a c character, nonzero otherwise.
+*/
+int strchr(char * str, char c){
+	while(*str){
+		if(*str++ == c)
+			return 1;
+	}
+	return 0;
+}
 
 /* Convers an int into an string. 
 ** Buffer must have enough space to accomodate value.
