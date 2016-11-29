@@ -34,17 +34,17 @@ void __initialize_syscall_vector() {
 }
 
 static void __setup_syscalls() {
-  syscall[SYSCALL_WRITE]              = __write;
-  syscall[SYSCALL_READ]               = __keyboard_key;
-  syscall[SYSCALL_CLEAN_SCREEN]       = __clear_screen;
-  syscall[SYSCALL_SET_COLOR]          = __set_color;
-  syscall[SYSCALL_KEYBOARD_LANGUAGE]  = __change_keyboard;
-  syscall[SYSCALL_PRIVATE_LINE]       = __private_line;
-	syscall[SYSCALL_RESERVE_MEMORY]     = __malloc;
-  syscall[SYSCALL_GET_ID_NETWORK]     = __net_id;
-  syscall[SYSCALL_CLEAR_MESSAGE]      = __net_clear;
-  syscall[SYSCALL_READ_MESSAGE]       = __net_read;
-  syscall[SYSCALL_SEND_MESSAGE]       = __net_send;
+  syscall[SYSCALL_WRITE]              = (syscall_t)__write;
+  syscall[SYSCALL_READ]               = (syscall_t)__keyboard_key;
+  syscall[SYSCALL_CLEAN_SCREEN]       = (syscall_t)__clear_screen;
+  syscall[SYSCALL_SET_COLOR]          = (syscall_t)__set_color;
+  syscall[SYSCALL_KEYBOARD_LANGUAGE]  = (syscall_t)__change_keyboard;
+  syscall[SYSCALL_PRIVATE_LINE]       = (syscall_t)__private_line;
+	syscall[SYSCALL_RESERVE_MEMORY]     = (syscall_t)__malloc;
+  syscall[SYSCALL_GET_ID_NETWORK]     = (syscall_t)__net_id;
+  syscall[SYSCALL_CLEAR_MESSAGE]      = (syscall_t)__net_clear;
+  syscall[SYSCALL_READ_MESSAGE]       = (syscall_t)__net_read;
+  syscall[SYSCALL_SEND_MESSAGE]       = (syscall_t)__net_send;
 }
 
 void __syscall_dispatcher(int id, uint64_t first_parameter, uint64_t second_parameter) {

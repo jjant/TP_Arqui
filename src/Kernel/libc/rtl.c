@@ -1,6 +1,7 @@
 #include <rtl.h>
 #include <ports.h>
 #include <string.h>
+#include <lib.h>
 
 static uint8_t MAC[6];
 
@@ -29,7 +30,7 @@ static uint8_t in_buffer[BUF_SIZE] = {0};
 static int pointer = 0;
 static int current = 0;
 
-static void __net_receive(int is_broadcast, char * msg);
+static void __net_receive(int is_broadcast, uint8_t * msg);
 static int __broadcasting(uint8_t *);
 
 void __net_init(){
@@ -38,11 +39,11 @@ void __net_init(){
   __outportb( IOADDR + 0x52, 0x0); // POWER
   __outportb( IOADDR + 0x37, 0x10); // RESET
   while( (__inportb(IOADDR + 0x37) & 0x10) != 0); // CLEAN 
-  __outportdw(IOADDR + 0x30, (uint32_t)in_buffer); // BUFFER IN
+  __outportdw(IOADDR + 0x30, (uint32_t)(long)in_buffer); // BUFFER IN
   __outportw(IOADDR + 0x3C, 0x000f); // TRANSMIT_OK & RECEIVE_OK SETUP
   __outportdw(IOADDR + 0x44, 0xf | (1 << 7)); // PACKAGES CLASSES SETUP
   __outportb(IOADDR + 0x37, 0x0C); // ENABLE TO TRANSMIT AND RECEIVE
-  __outportdw(TSAD0, (uint32_t)&transmission.frame); // SETUP BUFFER
+  __outportdw(TSAD0, (uint32_t)(long)&transmission.frame); // SETUP BUFFER
 
   // MAC SETUP
   for(i = 0; i < MAC_SIZE ; i++){
@@ -52,7 +53,6 @@ void __net_init(){
 }
 
 void __net_handler() {
-  int i;
   uint16_t isr = __inportw(ISR);
 
   if (isr & RECEIVE_OK) {
@@ -71,14 +71,14 @@ static int __broadcasting(uint8_t * frame) {
   return 1;
 }
 
-static void __net_receive(int is_broadcast, char * frame) { 
+static void __net_receive(int is_broadcast, uint8_t * frame) { 
   if(message_buffer[current].present == TRUE) return;
 
   message_buffer[current].present = TRUE;
   message_buffer[current].msg.broadcast = is_broadcast;
   message_buffer[current].msg.user = frame[ORIGIN_USER_BYTE_OFFSET];
   
-  strncpy(message_buffer[current].msg.data, frame + RX_DATA_OFFSET, MAX_MSG_SIZE);
+  strncpy(message_buffer[current].msg.data, (char *)(frame + RX_DATA_OFFSET), MAX_MSG_SIZE);
   current++;
   current = current % MSG_BUF_SIZE;
 }
@@ -125,7 +125,6 @@ int __net_id() {
 }
 
 void __net_send(char * msg, int dst){
-  int i;
   char send_msg[1000];
   char dst_str[5];
   // SET DESTINATION MAC
@@ -140,7 +139,6 @@ void __net_send(char * msg, int dst){
 
   // PREPARE BUFFERS
   uint32_t tsd = TSD0;
-  uint32_t tsad = TSAD0;
   transmission.frame.hdr.proto = ETH_P_802_3;
   uint32_t descriptor = ETH_HLEN + strlen(send_msg);
 

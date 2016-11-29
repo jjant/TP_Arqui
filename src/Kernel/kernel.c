@@ -9,6 +9,7 @@
 #include <kernel_initializer.h>
 #include <ethernet.h>
 #include <pci.h>
+#include <rtl.h>
 
 #define __console	((EntryPoint)(0x400000))
 

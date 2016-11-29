@@ -1,7 +1,7 @@
 #ifndef __SYSCALL_H
 #define __SYSCALL_H
 
-#include <stddef.h>
+typedef unsigned long size_t;
 
 void __syscall_handler();
 void __initialize_syscall_vector();

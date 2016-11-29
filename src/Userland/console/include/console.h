@@ -11,7 +11,7 @@
 #define BCAST_CMD_OFFSET 2
 
 
-typedef uint16_t (* shell_program)(const char **);
+typedef uint16_t (* shell_program)(char ** const);
 
 struct program_s {
   const char *name;
@@ -31,21 +31,22 @@ void private_line(char *);
 uint8_t set_color(uint8_t);
 char ** parse_input(char *, char **);
 uint16_t execute_program(struct program_s *, char **);
-uint16_t shell_invalid_input(const char **);
-uint16_t shell_quit(const char **);
-uint16_t shell_help(const char **);
-uint16_t shell_clean(const char **);
-uint16_t shell_hear(const char **);
-uint16_t shell_placeholder(const char **);
-uint16_t shell_send(const char **);
-uint16_t shell_color(const char **);
-uint16_t shell_language(const char **);
-uint16_t shell_text(const char **);
-uint16_t shell_colorscheme(const char **);
-uint16_t shell_null(const char **);
-uint16_t shell_echo(const char **);
-uint16_t shell_chat(const char **);
-uint16_t shell_beatles(const char **);
+uint16_t shell_invalid_input(char ** const);
+uint16_t shell_quit(char ** const);
+uint16_t shell_help(char ** const);
+uint16_t shell_clean(char ** const);
+uint16_t shell_hear(char ** const);
+uint16_t shell_placeholder(char ** const);
+uint16_t shell_send(char ** const);
+uint16_t shell_color(char ** const);
+uint16_t shell_language(char ** const);
+uint16_t shell_text(char ** const);
+uint16_t shell_colorscheme(char ** const);
+uint16_t shell_null(char ** const);
+uint16_t shell_echo(char ** const);
+uint16_t shell_chat(char ** const);
+uint16_t shell_beatles(char ** const);
 void clean_buffer(char *, uint16_t);
+void copy_buffer(char *, char *, uint16_t);
 
 #endif

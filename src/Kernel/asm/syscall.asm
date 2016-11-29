@@ -3,7 +3,6 @@ EXTERN __syscall_dispatcher
 
 GLOBAL __int_80_with_write_syscall
 
-
 __syscall_handler:
 	pushaq
 	mov 	rdi, rax	; syscall id

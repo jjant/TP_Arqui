@@ -99,7 +99,7 @@ void __putc(int c) {
 	if(c == '\n') {
 		if ((current_video - video) / (2 * 80) == height - 1) {
 			__scroll();
-			return 0;
+			return;
 		}
 
 		return __new_line();

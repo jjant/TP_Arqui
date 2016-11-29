@@ -31,7 +31,7 @@ void __IDT_add_handler(int index, uint64_t handler) {
 }
 
 void __initialize_IDT() {
-	__IDT_add_handler(0x20, (uint64_t) irq0Handler);
-	__IDT_add_handler(0x21, (uint64_t) irq1Handler);
-	__IDT_add_handler(0x2B, (uint64_t) irq11Handler);
+	__IDT_add_handler(0x20, (uint64_t)__irq_0_handler);
+	__IDT_add_handler(0x21, (uint64_t)__irq_1_handler);
+	__IDT_add_handler(0x2B, (uint64_t)__irq_11_handler);
 }

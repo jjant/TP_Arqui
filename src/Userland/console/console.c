@@ -97,7 +97,7 @@ char ** parse_input(char * kb_buffer, char ** args) {
       continue;
     }
 
-    if(*kb_buffer != ' ' || in_string && *kb_buffer == ' ') {
+    if(*kb_buffer != ' ' || (in_string && *kb_buffer == ' ')) {
       *current = *kb_buffer;
       current++;
     } else if (!in_string) {
@@ -136,31 +136,31 @@ uint16_t execute_program(struct program_s * programs, char ** args) {
 	return ret_val;
 }
 
-uint16_t shell_invalid_input(const char ** args) {
+uint16_t shell_invalid_input(char ** const args) {
 	puts(" Invalid input detected.");
 	putc('\n');
 	return SHELL_OK;
 }
 
-uint16_t shell_quit(const char ** args) {
+uint16_t shell_quit(char ** const args) {
 	puts(args[1]);
 	puts(" Quitting shell.");
 	putc('\n');
 	return SHELL_QUIT;
 }
 
-uint16_t shell_placeholder(const char ** args) {
+uint16_t shell_placeholder(char ** const args) {
   if (args[1]) console_placeholder = args[1];
   return SHELL_OK;
 }
 
-uint16_t shell_echo(const char ** args) {
+uint16_t shell_echo(char ** const args) {
 	puts(" Este es el program help.");
 	putc('\n');
 	return SHELL_OK;
 }
 
-uint16_t shell_help(const char ** args) {
+uint16_t shell_help(char ** const args) {
   int i = -1;
   while(programs[++i].name) {
     if (strcmp(programs[i].name, args[1]) == 0) {
@@ -193,7 +193,7 @@ uint16_t shell_help(const char ** args) {
   return SHELL_OK;
 }
 
-uint16_t shell_text(const char ** args) {
+uint16_t shell_text(char ** const args) {
 	char c;
 	cls();
 	
@@ -208,7 +208,7 @@ uint16_t shell_text(const char ** args) {
 	return SHELL_OK;
 }
 
-uint16_t shell_send(const char ** args) {
+uint16_t shell_send(char ** const args) {
 	if (args[1]) {
 		net_clear();
 		if (strcmp(args[1], "WHOAMI") == 0) {
@@ -230,7 +230,7 @@ uint16_t shell_send(const char ** args) {
 	return SHELL_OK;
 }
 
-uint16_t shell_hear(const char ** args) {
+uint16_t shell_hear(char ** const args) {
 	char buffer[1000];
 	typedef struct{
 	  int is_broadcast;
@@ -238,7 +238,7 @@ uint16_t shell_hear(const char ** args) {
 	} message_meta_t;
 
 	message_meta_t message_info;
-  if(!net_read(buffer, (uint64_t) &message_info, 1000)){
+  if(!net_read(buffer, (void *) &message_info, 1000)){
     printf(" El buzon esta vacio");
     putc('\n');
   }else{
@@ -247,13 +247,13 @@ uint16_t shell_hear(const char ** args) {
   	    printf(" %s %d: %s", message_info.is_broadcast ? "PUBLIC" : "PRIVATE", message_info.user, buffer);
   			putc('\n');
       }
-    } while(net_read(buffer, (uint64_t) &message_info, 1000));
+    } while(net_read(buffer, (void *) &message_info, 1000));
   }
 
 	return SHELL_OK;
 }
 
-uint16_t shell_color(const char ** args) {
+uint16_t shell_color(char ** const args) {
   static struct color_s colors[] = {
     {"NEGRO",     0},
     {"AZUL",      1},
@@ -285,7 +285,7 @@ uint16_t shell_color(const char ** args) {
   return SHELL_OK;
 }
 
-uint16_t shell_colorscheme(const char ** args) {
+uint16_t shell_colorscheme(char ** const args) {
 	
 	if(strcmp(args[1], "RIBER") == 0) { 			set_color(7); console_color = 4; }
 	else if(strcmp(args[1], "BOCA") == 0) { 	set_color(1); console_color = 14; }
@@ -295,12 +295,12 @@ uint16_t shell_colorscheme(const char ** args) {
 	return SHELL_OK;
 }
 
-uint16_t shell_clean(const char ** args) {
+uint16_t shell_clean(char ** const args) {
 	cls();
 	return SHELL_OK;
 }
 
-uint16_t shell_language(const char ** args) {
+uint16_t shell_language(char ** const args) {
 
 	if(strcmp(args[1], "ENGLISH") == 0) 		set_keyboard_language(0);
 	else if(strcmp(args[1], "EASTER") == 0) set_keyboard_language(1);
@@ -310,11 +310,11 @@ uint16_t shell_language(const char ** args) {
 	return SHELL_OK;
 }
 
-uint16_t shell_null(const char ** args) {
+uint16_t shell_null(char ** const args) {
 	return SHELL_OK;
 }
 
-uint16_t shell_beatles(const char ** args) {
+uint16_t shell_beatles(char ** const args) {
   puts(" Help! I need somebody\n");
   puts(" Help! not just anybody\n");
   puts(" Help! you know i need someone\n");

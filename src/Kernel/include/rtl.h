@@ -1,7 +1,6 @@
 #ifndef __RTL_H
 #define __RTL_H
 
-#include <port.h>
 #include <stdint.h>
 #include <string.h>
 #include <memory.h>

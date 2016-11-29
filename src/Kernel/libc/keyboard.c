@@ -61,7 +61,7 @@ char __push_key() {
   }
 
   // CAPS MANAGEMENT
-  if (isChar && (caps && shift || !caps && !shift)) {
+  if (isChar && ((caps && shift) || (!caps && !shift))) {
     key = key - 'A' + 'a';
   } else if (isNumeric && shift) {
     key = special_keys[key - '0'];
@@ -94,7 +94,7 @@ void __flush() {
 char __key_pressed() {
 	int keycode = 0;
 	while(1) {
-		if(keycode = __key_pressed_asm())
+		if((keycode = __key_pressed_asm()))
 			return __code_to_char(keycode);
 	}
 }

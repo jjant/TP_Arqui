@@ -4,9 +4,9 @@
 #include <stdint.h>
 
 void sti();
-void irq0Handler();
-void irq1Handler();
-void irq11Handler();
+void __irq_0_handler();
+void __irq_1_handler();
+void __irq_11_handler();
 
 void __set_pic_master(uint8_t);
 void __set_slave_master(uint8_t);

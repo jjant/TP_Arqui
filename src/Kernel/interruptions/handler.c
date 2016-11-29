@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <tick.h>
 
-void __set_pic_slave_asm(uint8_t);
+void __set_pic_master_asm(uint8_t);
 void __set_pic_slave_asm(uint8_t);
 
 typedef void (*handler_t)(void);

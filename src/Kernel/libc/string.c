@@ -1,5 +1,7 @@
 #include <string.h>
 #include <stdarg.h>
+#include <memory.h>
+#include <video.h>
 
 /* Maybe these should go in userland section, as they don't system memory/stuff.
 ** I don't know.
@@ -48,7 +50,7 @@ void putint(int value) {
 }
 
 uint8_t is_char(char c) {
-  return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == ' ' || c >= 0 && c <= 9;
+  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == ' ' || (c >= 0 && c <= 9);
 }
 
 void itoa(int n, char * s) {
@@ -147,7 +149,7 @@ char * int_to_str(int value, char * buffer) {
 	int shifter = value;
 
 	do {
-		*p++;
+		p++;
 		shifter /= 10;
 	} while(shifter);
 
