@@ -21,12 +21,12 @@ static void * const console_module_address = (void*)0x400000;
 
 typedef int (*EntryPoint)();
 
-void clearBSS(void * bssAddress, uint64_t bssSize)
+void __clear_BSS(void * bssAddress, uint64_t bssSize)
 {
-	memset(bssAddress, 0, bssSize);
+	__memset(bssAddress, 0, bssSize);
 }
 
-void * getStackBase()
+void * __get_stack_base()
 {
 	return (void*)(
 		(uint64_t)&endOfKernel
@@ -41,10 +41,10 @@ void * __initialize_kernel_binary()
 	void * moduleAddresses[] = {
 		console_module_address
 	};
-	loadModules(&endOfKernelBinary, moduleAddresses);
+	__load_modules(&endOfKernelBinary, moduleAddresses);
 	__puts("[Done]\n");
 	__puts("[Initializing kernel's binary]\n");
 
-	clearBSS(&bss, &endOfKernel - &bss);
-	return getStackBase();
+	__clear_BSS(&bss, &endOfKernel - &bss);
+	return __get_stack_base();
 }

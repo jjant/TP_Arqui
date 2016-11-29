@@ -37,8 +37,8 @@
 
 void __net_init();
 void __net_handler();
-int __net_read(char* buf, void * info, int max_size);
-void __net_send(char * msg, int dst);
+int __net_read(char *, void *, int);
+void __net_send(char *, int);
 void __net_clear();
 int __net_id();
 

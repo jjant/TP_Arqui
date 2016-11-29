@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-void sti();
 void __irq_0_handler();
 void __irq_1_handler();
 void __irq_11_handler();

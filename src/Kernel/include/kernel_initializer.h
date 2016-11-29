@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-void clearBSS(void *, uint64_t);
-void * getStackBase();
+void __clear_BSS(void *, uint64_t);
+void * __get_stack_base();
 void * __initialize_kernel_binary();
 
 #endif

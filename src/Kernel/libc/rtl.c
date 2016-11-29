@@ -130,7 +130,7 @@ void __net_send(char * msg, int dst){
   // SET DESTINATION MAC
   static unsigned char brdMAC[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
   unsigned char dstMAC[6] = { 0xBA, 0xDA, 0x55, 0xEE, 0x55, (unsigned char)dst };
-  memcpy(transmission.frame.hdr.dst, dst < 0 ? brdMAC : dstMAC, 6);
+  __memcpy(transmission.frame.hdr.dst, dst < 0 ? brdMAC : dstMAC, 6);
 
   // PREPARE MESSAGE
   int_to_str(dst, dst_str);
@@ -144,7 +144,7 @@ void __net_send(char * msg, int dst){
 
   // LOAD MESSAGE
 
-  memcpy(transmission.frame.data, send_msg, strlen(send_msg));
+  __memcpy(transmission.frame.data, send_msg, strlen(send_msg));
 
   transmission.size = descriptor; 
   descriptor &= ~(TSD_OWN);

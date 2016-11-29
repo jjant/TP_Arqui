@@ -15,8 +15,8 @@
 #define MEMORY_MAPPING 0
 #define NULL (void *)  0
 
-void os_pci_write_reg(uint8_t, uint8_t, uint16_t, uint64_t);
-uint32_t os_pci_read_reg(uint8_t, uint8_t, uint16_t);
+void __os_pci_write_reg(uint8_t, uint8_t, uint16_t, uint64_t);
+uint32_t __os_pci_read_reg(uint8_t, uint8_t, uint16_t);
 void __DMA_init();
 
 #endif

@@ -3,6 +3,7 @@
 
 #include <video.h>
 #include <string.h>
+
 #define BUFFER_SIZE 128
 
 int __key_pressed_asm();
